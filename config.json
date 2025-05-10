@@ -1,0 +1,7 @@
+{
+    "name_server": "GABO",
+    "database": "SANFRANCISCANOS",
+    "username": "pythonConnection",
+    "password": "HolaMeConectoDesdePython3#",
+    "controlador_odbc": "ODBC Driver 17 for SQL Server"
+}
