@@ -61,10 +61,21 @@ def create_app():
     app.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
     # Registrar Blueprints
-    from . import routes 
-    app.register_blueprint(routes.bp)
+    from . import documents 
+    app.register_blueprint(documents.bp)
 
-    
+    from . import persons 
+    app.register_blueprint(persons.bp)
+
+    from . import institutions 
+    app.register_blueprint(institutions.bp)
+
+    from . import sacraments 
+    app.register_blueprint(sacraments.bp)
+
+    from . import levels 
+    app.register_blueprint(levels.bp)
+
     from . import home
     app.register_blueprint(home.bp)
 

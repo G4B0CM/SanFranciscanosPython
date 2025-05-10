@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from sqlalchemy import text
 from .forms import DataSheetForm
-import datetime # Necesario para conversión de fechas si el formulario no lo hace automáticamente
+import datetime 
 
 bp = Blueprint('Documents', __name__, url_prefix='/Documents')
 
