@@ -4,3 +4,4 @@ from .forms import DataSheetForm
 import datetime
 
 bp = Blueprint('Persons', __name__, url_prefix='/Persons')
+
