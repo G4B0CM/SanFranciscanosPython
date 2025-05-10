@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% from "_form_helpers.html" import render_field %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <h1 class="mb-4">{{ title }}</h1>
+        <form method="POST" action="{{ url_for('Documents.new_data_sheet') }}" novalidate>
+            {{ form.hidden_tag() }} <!-- CSRF token -->
+
+            <fieldset class="mb-4 p-3 border rounded">
+                <legend class="w-auto px-2">Datos del Catequizando</legend>
+                <div class="row g-3">
+                    <div class="col-md-6">{{ render_field(form.c_firstName, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.c_secondName, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.c_lastName, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.c_secondLastName, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.c_sex, class="form-select") }}</div>
+                    <div class="col-md-6">{{ render_field(form.c_birthdate, class="form-control", type="date") }}</div>
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-4">{{ render_field(form.ds_sonNumbr, class="form-control", type="number") }}
+                    </div>
+                    <div class="col-md-4">{{ render_field(form.ds_numbrBrothers, class="form-control", type="number") }}
+                    </div>
+                    <div class="col-md-4">{{ render_field(form.ds_livesWith, class="form-control") }}</div>
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">{{ render_field(form.ds_residentialPhone, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.ds_mainAddress, class="form-control", rows="2") }}</div>
+                </div>
+                <hr class="my-3">
+                <div class="row g-3">
+                    <div class="col-md-4">{{ render_field(form.c_bloodType, class="form-control") }}</div>
+                    <div class="col-md-8">{{ render_field(form.c_alergies, class="form-control", rows="2") }}</div>
+                    <div class="col-md-6">{{ render_field(form.c_emergencyContactName, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.c_emergencyContactPhone, class="form-control") }}</div>
+                    <div class="col-12">{{ render_field(form.c_details, class="form-control", rows="2") }}</div>
+                    <div class="col-md-6">{{ render_field(form.c_idInstitution, class="form-control", type="number",
+                        placeholder="ID Parroquia (Cate.)") }}</div>
+                </div>
+            </fieldset>
+
+            <fieldset class="mb-4 p-3 border rounded">
+                <legend class="w-auto px-2">Datos del Padre (Opcional)</legend>
+                <div class="row g-3">
+                    <div class="col-md-6">{{ render_field(form.f_firstName, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.f_secondName, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.f_lastName, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.f_secondLastName, class="form-control") }}</div>
+                    <div class="col-md-4">{{ render_field(form.f_ocupation, class="form-control") }}</div>
+                    <div class="col-md-4">{{ render_field(form.f_phoneContact, class="form-control") }}</div>
+                    <div class="col-md-4">{{ render_field(form.f_emailContact, class="form-control", type="email") }}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="mb-4 p-3 border rounded">
+                <legend class="w-auto px-2">Datos de la Madre (Opcional)</legend>
+                <div class="row g-3">
+                    <div class="col-md-6">{{ render_field(form.m_firstName, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.m_secondName, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.m_lastName, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.m_secondLastName, class="form-control") }}</div>
+                    <div class="col-md-4">{{ render_field(form.m_ocupation, class="form-control") }}</div>
+                    <div class="col-md-4">{{ render_field(form.m_phoneContact, class="form-control") }}</div>
+                    <div class="col-md-4">{{ render_field(form.m_emailContact, class="form-control", type="email") }}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="mb-4 p-3 border rounded">
+                <legend class="w-auto px-2">Información Adicional de la Ficha</legend>
+                <div class="row g-3">
+                    <div class="col-md-4">{{ render_field(form.ds_idInstitution, class="form-control", type="number",
+                        placeholder="ID Institución (Ficha)") }}</div>
+                    <div class="col-md-4">{{ render_field(form.ds_idCertificate, class="form-control", type="number",
+                        placeholder="ID Certificado") }}</div>
+                    <div class="col-md-4">{{ render_field(form.ds_idLevel, class="form-control", type="number",
+                        placeholder="ID Nivel") }}</div>
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">{{ render_field(form.ds_schoolsName, class="form-control") }}</div>
+                    <div class="col-md-6">{{ render_field(form.ds_schoolGrade, class="form-control") }}</div>
+                </div>
+            </fieldset>
+
+            <div class="d-grid gap-2">
+                {{ form.submit(class="btn btn-primary btn-lg") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

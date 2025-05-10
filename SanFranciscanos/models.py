@@ -26,24 +26,11 @@ class Person(Base):
     secondLastName: Mapped[Optional[str]] = mapped_column(Unicode(30))
     sex: Mapped[Optional[str]] = mapped_column(CHAR(1))
 
-    # Relación uno a muchos: Una Persona puede ser muchos Padres/Madres (en diferentes contextos de catequizado)
-    # Esto puede ser confuso. La tabla Parent vincula un idPerson (del padre/madre) a un idCatequizado.
-    # La relación debería ser más bien desde Parent hacia Person.
-    # Dejaré la original por ahora, pero es un punto a revisar en la lógica de la relación.
     parents_representing: Mapped[List['Parent']] = relationship('Parent', back_populates='person_record', foreign_keys='Parent.idPerson')
 
-    # Para herencia unida, cada subclase tendrá su propia relación a Person
-    # Si un Ayudante ES una Persona, la relación es implícita por la herencia.
-    # No necesitamos una relación explícita aquí para cada tipo de persona si usamos herencia.
 
-    # Relación a Curso (si un Ayudante, que es una Persona, está en un Curso)
-    # Esta relación es problemática aquí porque Person es la base.
-    # La relación con Curso debería estar en Ayudante si es específica de Ayudante.
-    # cursos_como_ayudante: Mapped[List['Curso']] = relationship('Curso', back_populates='ayudante_persona', foreign_keys='Curso.idAyudante')
-
-
-class Parent(Base): # Parent no hereda de Person, es una entidad separada que REPRESENTA a una persona.
-    __tablename__ = 'Parent' # Tu tabla se llama Parent, no Padre
+class Parent(Base): 
+    __tablename__ = 'Parent' 
     __table_args__ = (
         # ForeignKeyConstraint(['idCatequizado'], ['Persons.Catequizado.idPerson'], name='ParentCatequizado_FK'), # Parent se vincula a Catequizado, no a Person directamente
         PrimaryKeyConstraint('idPerson', name='Parent_PK'), # idPerson aquí es el ID de la persona que ES el padre/madre
