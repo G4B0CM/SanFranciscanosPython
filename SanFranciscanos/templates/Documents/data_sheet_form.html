@@ -8,7 +8,7 @@
     <div class="col-md-10 col-lg-8">
         <h1 class="mb-4">{{ title }}</h1>
         <form method="POST" action="{{ url_for('Documents.new_data_sheet') }}" novalidate>
-            {{ form.hidden_tag() }} <!-- CSRF token -->
+            {{ form.hidden_tag() }}
 
             <fieldset class="mb-4 p-3 border rounded">
                 <legend class="w-auto px-2">Datos del Catequizando</legend>

@@ -53,3 +53,5 @@ class DataSheetForm(FlaskForm):
 
     submit = SubmitField('Guardar Hoja de Datos')
 
+class DeleteForm(FlaskForm):
+    submit = SubmitField('Eliminar')
