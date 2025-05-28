@@ -55,3 +55,35 @@ class DataSheetForm(FlaskForm):
 
 class DeleteForm(FlaskForm):
     submit = SubmitField('Eliminar')
+    
+class CatequistaForm(FlaskForm):
+    firstName = StringField('Primer Nombre', validators=[DataRequired(), Length(max=30)])
+    secondName = StringField('Segundo Nombre', validators=[Optional(), Length(max=30)])
+    lastName = StringField('Primer Apellido', validators=[DataRequired(), Length(max=30)])
+    secondLastName = StringField('Segundo Apellido', validators=[Optional(), Length(max=30)])
+    sex = SelectField('Sexo', choices=[('', '-- Seleccione --'), ('M', 'Masculino'), ('F', 'Femenino')], validators=[DataRequired()])
+    birthdate = DateField('Fecha de Nacimiento', format='%Y-%m-%d', validators=[DataRequired()])
+    bloodType = StringField('Tipo de Sangre', validators=[DataRequired(), Length(max=5)])
+    emergencyContactName = StringField('Nombre Contacto de Emergencia', validators=[Optional(), Length(max=50)])
+    emergencyContactPhone = StringField('Teléfono Emergencia', validators=[Optional(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$')])
+    idInstitution = IntegerField('ID Parroquia Asociada', validators=[Optional()])
+    submit = SubmitField('Guardar Catequista')
+
+class PadrinoForm(FlaskForm):
+    firstName = StringField('Primer Nombre', validators=[DataRequired(), Length(max=30)])
+    secondName = StringField('Segundo Nombre', validators=[Optional(), Length(max=30)])
+    lastName = StringField('Primer Apellido', validators=[DataRequired(), Length(max=30)])
+    secondLastName = StringField('Segundo Apellido', validators=[Optional(), Length(max=30)])
+    sex = SelectField('Sexo', choices=[('', '-- Seleccione --'), ('M', 'Masculino'), ('F', 'Femenino')], validators=[DataRequired()])
+    phoneContact = StringField('Teléfono', validators=[Optional(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$')])
+    emailContact = StringField('Correo Electrónico', validators=[Optional(), Email(), Length(max=50)])
+    submit = SubmitField('Guardar Padrino')
+
+class EclesiasticoForm(FlaskForm):
+    firstName = StringField('Primer Nombre', validators=[DataRequired(), Length(max=30)])
+    secondName = StringField('Segundo Nombre', validators=[Optional(), Length(max=30)])
+    lastName = StringField('Primer Apellido', validators=[DataRequired(), Length(max=30)])
+    secondLastName = StringField('Segundo Apellido', validators=[Optional(), Length(max=30)])
+    phoneContact = StringField('Teléfono', validators=[Optional(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$')])
+    emailContact = StringField('Correo Electrónico', validators=[Optional(), Email(), Length(max=50)])
+    submit = SubmitField('Guardar Eclesiástico')
