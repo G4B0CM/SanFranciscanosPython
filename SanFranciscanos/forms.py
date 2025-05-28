@@ -87,3 +87,62 @@ class EclesiasticoForm(FlaskForm):
     phoneContact = StringField('Teléfono', validators=[Optional(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$')])
     emailContact = StringField('Correo Electrónico', validators=[Optional(), Email(), Length(max=50)])
     submit = SubmitField('Guardar Eclesiástico')
+
+class ParroquiaForm(FlaskForm):
+    name = StringField('Nombre de la Parroquia', validators=[DataRequired(), Length(max=100)])
+    address = StringField('Dirección', validators=[Optional(), Length(max=150)])
+    phone = StringField('Teléfono de Contacto', validators=[Optional(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$')])
+    email = StringField('Correo Electrónico', validators=[Optional(), Email(), Length(max=50)])
+    idVicaria = IntegerField('ID Vicaria a la que pertenece', validators=[DataRequired()])
+    submit = SubmitField('Guardar Parroquia')
+
+class VicariaForm(FlaskForm):
+    name = StringField('Nombre de la Vicaria', validators=[DataRequired(), Length(max=100)])
+    address = StringField('Dirección', validators=[Optional(), Length(max=150)])
+    phone = StringField('Teléfono de Contacto', validators=[Optional(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$')])
+    email = StringField('Correo Electrónico', validators=[Optional(), Email(), Length(max=50)])
+    idArquidiocesis = IntegerField('ID Arquidiócesis a la que pertenece', validators=[DataRequired()])
+    submit = SubmitField('Guardar Vicaria')
+
+class ArquidiocesisForm(FlaskForm):
+    name = StringField('Nombre de la Arquidiócesis', validators=[DataRequired(), Length(max=100)])
+    address = StringField('Dirección', validators=[Optional(), Length(max=150)])
+    phone = StringField('Teléfono de Contacto', validators=[Optional(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$')])
+    email = StringField('Correo Electrónico', validators=[Optional(), Email(), Length(max=50)])
+    submit = SubmitField('Guardar Arquidiócesis')
+
+class LevelForm(FlaskForm):
+    name = StringField('Nombre del Nivel', validators=[DataRequired(), Length(max=50)])
+    description = TextAreaField('Descripción del Nivel', validators=[Optional(), Length(max=250)])
+    order = IntegerField('Orden del Nivel', validators=[DataRequired(), NumberRange(min=1)])
+    submit = SubmitField('Guardar Nivel')
+
+class CursoForm(FlaskForm):
+    name = StringField('Nombre del Curso', validators=[DataRequired(), Length(max=50)])
+    idParroquia = IntegerField('ID Parroquia', validators=[DataRequired()])
+    idCatequista = IntegerField('ID Catequista Responsable', validators=[DataRequired()])
+    idLevel = IntegerField('ID Nivel Asociado', validators=[DataRequired()])
+    startDate = DateField('Fecha de Inicio', format='%Y-%m-%d', validators=[DataRequired()])
+    endDate = DateField('Fecha de Fin', format='%Y-%m-%d', validators=[DataRequired()])
+    submit = SubmitField('Guardar Curso')
+
+class GruposForm(FlaskForm):
+    idCatequizado = IntegerField('ID Catequizado', validators=[DataRequired()])
+    idCurso = IntegerField('ID Curso', validators=[DataRequired()])
+    fechaInscripcion = DateField('Fecha de Inscripción', format='%Y-%m-%d', validators=[DataRequired()])
+    submit = SubmitField('Guardar Inscripción en Grupo')
+
+class SacramentForm(FlaskForm):
+    name = StringField('Nombre del Sacramento', validators=[DataRequired(), Length(max=50)])
+    description = TextAreaField('Descripción del Sacramento', validators=[Optional(), Length(max=250)])
+    required = BooleanField('¿Es Requisito para Inscribirse a un Nivel?', default=False)
+    submit = SubmitField('Guardar Sacramento')
+
+class CatequizadoSacramentoForm(FlaskForm):
+    idCatequizado = IntegerField('ID del Catequizado', validators=[DataRequired()])
+    idSacramento = IntegerField('ID del Sacramento', validators=[DataRequired()])
+    dateReceived = DateField('Fecha de Recepción', format='%Y-%m-%d', validators=[DataRequired()])
+    lugar = StringField('Lugar del Sacramento', validators=[Optional(), Length(max=100)])
+    observaciones = TextAreaField('Observaciones', validators=[Optional(), Length(max=250)])
+    submit = SubmitField('Guardar Relación Catequizado-Sacramento')
+
