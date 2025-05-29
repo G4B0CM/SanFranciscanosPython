@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Listado de Vicarías</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.nombre }}</td>
+            <td>
+                <a href="{{ url_for('Institutions.detail_vicaria', id=item.id) }}" class="btn btn-info btn-sm">Ver</a>
+                <a href="{{ url_for('Institutions.edit_vicaria', id=item.id) }}" class="btn btn-warning btn-sm">Editar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('Institutions.create_vicaria') }}" class="btn btn-primary">Agregar nueva Vicaría</a>
+{% endblock %}

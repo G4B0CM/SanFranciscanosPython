@@ -1,0 +1,28 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ title }}</h2>
+<a href="{{ url_for('Levels.create_level') }}" class="btn btn-success">Nuevo Nivel</a>
+<table>
+    <thead>
+        <tr><th>Nombre</th><th>Descripción</th><th>Orden</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+        {% for level in levels %}
+        <tr>
+            <td>{{ level.name }}</td>
+            <td>{{ level.description }}</td>
+            <td>{{ level.order }}</td>
+            <td>
+                <a href="{{ url_for('Levels.edit_level', id=level.idLevel) }}">Editar</a>
+                <a href="{{ url_for('Levels.detail_level', id=level.idLevel) }}">Detalles</a>
+                <form method="post" action="{{ url_for('Levels.delete_level', id=level.idLevel) }}" style="display:inline;">
+                    {{ delete_form.hidden_tag() }}
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

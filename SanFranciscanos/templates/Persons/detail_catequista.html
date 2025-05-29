@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% extends "base.html" %}
+
+{% block title %}Detalle de Catequista{% endblock %}
+
+{% block content %}
+<h2>Detalle de Catequista</h2>
+<ul class="list-group">
+  <li class="list-group-item"><strong>ID:</strong> {{ person.idPerson }}</li>
+  <li class="list-group-item"><strong>Nombre:</strong> {{ person.firstName }} {{ person.lastName }}</li>
+  <li class="list-group-item"><strong>Sexo:</strong> {{ person.sex }}</li>
+  <li class="list-group-item"><strong>Fecha de Nacimiento:</strong> {{ person.birthdate }}</li>
+  <li class="list-group-item"><strong>Tipo de Sangre:</strong> {{ person.bloodType }}</li>
+  <li class="list-group-item"><strong>Contacto de Emergencia:</strong> {{ person.emergencyContactName }} - {{ person.emergencyContactPhone }}</li>
+</ul>
+<a href="{{ url_for('Persons.list_persons', role=role|capitalize) }}" class="btn btn-secondary mt-3">Volver</a>
+{% endblock %}

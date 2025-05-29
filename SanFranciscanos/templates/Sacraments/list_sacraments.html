@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ title }}</h2>
+<table class="table">
+    <thead><tr><th>Nombre</th><th>Descripción</th><th>Requerido</th><th>Acciones</th></tr></thead>
+    <tbody>
+    {% for s in sacraments %}
+    <tr>
+        <td>{{ s.name }}</td>
+        <td>{{ s.description }}</td>
+        <td>{{ 'Sí' if s.required else 'No' }}</td>
+        <td>
+            <a href="{{ url_for('Sacraments.detail_sacrament', id=s.idSacrament) }}" class="btn btn-info btn-sm">Ver</a>
+            <a href="{{ url_for('Sacraments.edit', id=s.idSacrament) }}" class="btn btn-warning btn-sm">Editar</a>
+            <form method="POST" action="{{ url_for('Sacraments.delete', id=s.idSacrament) }}" style="display:inline;">
+                {{ delete_form.hidden_tag() }}
+                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('Sacraments.new') }}" class="btn btn-success">Nuevo Sacramento</a>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Detalle de Vicaría</h2>
+<ul class="list-group">
+    <li class="list-group-item"><strong>ID:</strong> {{ item.id }}</li>
+    <li class="list-group-item"><strong>Nombre:</strong> {{ item.nombre }}</li>
+</ul>
+<a href="{{ url_for('Institutions.list_vicaria') }}" class="btn btn-secondary mt-3">Volver</a>
+{% endblock %}

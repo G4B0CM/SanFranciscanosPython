@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ title }}</h2>
+<ul class="list-group">
+    <li class="list-group-item"><strong>Nombre:</strong> {{ detail.name }}</li>
+    <li class="list-group-item"><strong>Descripción:</strong> {{ detail.description }}</li>
+    <li class="list-group-item"><strong>Requerido:</strong> {{ 'Sí' if detail.required else 'No' }}</li>
+    <li class="list-group-item"><strong>Estado:</strong> {{ detail.state }}</li>
+    <li class="list-group-item"><strong>Creado en:</strong> {{ detail.createdAt }}</li>
+    <li class="list-group-item"><strong>Actualizado en:</strong> {{ detail.updatedAt }}</li>
+</ul>
+<a href="{{ url_for('Sacraments.index') }}" class="btn btn-secondary mt-3">Volver a la lista</a>
+{% endblock %}

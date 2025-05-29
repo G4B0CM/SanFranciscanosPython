@@ -1,0 +1,14 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ title }}</h2>
+<ul>
+    <li><strong>Nombre:</strong> {{ detail.name }}</li>
+    <li><strong>Descripción:</strong> {{ detail.description }}</li>
+    <li><strong>Orden:</strong> {{ detail.order }}</li>
+    <li><strong>Estado:</strong> {{ detail.state }}</li>
+    <li><strong>Creado en:</strong> {{ detail.createdAt }}</li>
+    <li><strong>Actualizado en:</strong> {{ detail.updatedAt }}</li>
+</ul>
+<a href="{{ url_for('Levels.index') }}">Volver a la lista</a>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% extends "base.html" %}
+{% block title %}Lista de Catequistas{% endblock %}
+
+{% block content %}
+<h1>Catequistas</h1>
+<a href="{{ url_for('Persons.new_person', role=role|capitalize) }}" class="btn btn-primary mb-3">Nuevo Catequista</a>
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>ID</th><th>Nombre</th><th>Apellido</th><th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in persons %}
+    <tr>
+      <td>{{ p.idPerson }}</td>
+      <td>{{ p.firstName }}</td>
+      <td>{{ p.lastName }}</td>
+      <td>
+        <a href="{{ url_for('Persons.edit_person', role=role|capitalize, id=p.idPerson) }}" class="btn btn-sm btn-warning">Editar</a>
+        <a href="{{ url_for('Persons.detail_person', role=role|capitalize, id=p.idPerson) }}" class="btn btn-sm btn-info">Ver</a>
+        <form method="POST" action="{{ url_for('Persons.delete_person', role=role|capitalize, id=p.idPerson) }}" style="display:inline;">
+          {{ delete_form.hidden_tag() }}
+          <button class="btn btn-sm btn-danger">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
