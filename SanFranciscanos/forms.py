@@ -145,4 +145,40 @@ class CatequizadoSacramentoForm(FlaskForm):
     lugar = StringField('Lugar del Sacramento', validators=[Optional(), Length(max=100)])
     observaciones = TextAreaField('Observaciones', validators=[Optional(), Length(max=250)])
     submit = SubmitField('Guardar Relación Catequizado-Sacramento')
+    
+class AyudanteForm(FlaskForm):
+    firstName = StringField('Primer Nombre', validators=[DataRequired(), Length(max=30)])
+    secondName = StringField('Segundo Nombre', validators=[Optional(), Length(max=30)])
+    lastName = StringField('Primer Apellido', validators=[DataRequired(), Length(max=30)])
+    secondLastName = StringField('Segundo Apellido', validators=[Optional(), Length(max=30)])
+    sex = SelectField('Sexo', choices=[('', '-- Seleccione --'), ('M', 'Masculino'), ('F', 'Femenino')], validators=[DataRequired()])
+    birthdate = DateField('Fecha de Nacimiento', format='%Y-%m-%d', validators=[DataRequired()])
+    bloodType = StringField('Tipo de Sangre', validators=[Optional(), Length(max=5)])
+    emergencyContactName = StringField('Nombre Contacto de Emergencia', validators=[Optional(), Length(max=50)])
+    emergencyContactPhone = StringField('Teléfono Emergencia', validators=[Optional(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$')])
+    idInstitution = IntegerField('ID Parroquia Asociada', validators=[Optional()])
+    submit = SubmitField('Guardar Ayudante')
+
+class PadreMadreForm(FlaskForm):
+    firstName = StringField('Primer Nombre', validators=[DataRequired(), Length(max=30)])
+    secondName = StringField('Segundo Nombre', validators=[Optional(), Length(max=30)])
+    lastName = StringField('Primer Apellido', validators=[DataRequired(), Length(max=30)])
+    secondLastName = StringField('Segundo Apellido', validators=[Optional(), Length(max=30)])
+    ocupation = StringField('Ocupación', validators=[Optional(), Length(max=50)])
+    phoneContact = StringField('Teléfono', validators=[Optional(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$')])
+    emailContact = StringField('Correo Electrónico', validators=[Optional(), Email(), Length(max=50)])
+    idInstitution = IntegerField('ID Parroquia Asociada', validators=[Optional()])
+    submit = SubmitField('Guardar Padre/Madre')
+
+class RolSelectorForm(FlaskForm):
+    role = SelectField('Seleccionar Rol', choices=[
+        ('', '-- Seleccione un Rol --'),
+        ('Catequista', 'Catequista'),
+        ('Ayudante', 'Ayudante'),
+        ('Eclesiastico', 'Eclesiástico'),
+        ('Padrino', 'Padrino'),
+        ('PadreMadre', 'Padre/Madre')
+    ], validators=[DataRequired()])
+    submit = SubmitField('Continuar')
+
 

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from "_form_helpers.html" import render_field %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<form method="POST">
+  {{ form.hidden_tag() }}
+  {{ render_field(form.name, class="form-control") }}
+  {{ render_field(form.description, class="form-control", rows=3) }}
+  {{ render_field(form.order, class="form-control") }}
+  {{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock %}
