@@ -1,16 +1,125 @@
 {% extends 'base.html' %}
 
 {% block header %}
-
 {% endblock %}
 
 {% block content %}
+
+<style>
+    /* Fondo general difuminado suave con el color principal */
+    body {
+        background: linear-gradient(135deg, rgba(255,195,65,0.3) 0%, rgba(255,195,65,0) 70%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    /* Contenedor principal */
+    .container {
+        background: rgba(255, 195, 65, 0.15);
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(255,195,65,0.3);
+        padding: 30px 40px;
+        max-width: 900px;
+        margin-bottom: 40px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,195,65,0.4);
+    }
+
+    /* Título principal */
+    h1 {
+        color: rgb(255, 195, 65);
+        text-shadow: 0 0 10px rgb(255, 195, 65);
+        font-weight: 700;
+        margin-bottom: 25px;
+    }
+
+    /* Inputs */
+    input.form-control {
+        border: 2px solid rgb(255, 195, 65);
+        border-radius: 10px;
+        padding: 12px 15px;
+        font-size: 1rem;
+        transition: 0.3s ease all;
+        background: rgba(255, 195, 65, 0.05);
+        box-shadow: inset 0 0 8px rgba(255,195,65,0.2);
+        color: #333;
+    }
+
+    /* Input focus */
+    input.form-control:focus {
+        border-color: rgb(255, 195, 65);
+        box-shadow: 0 0 15px rgb(255, 195, 65);
+        background: rgba(255, 195, 65, 0.15);
+        outline: none;
+        color: #000;
+    }
+
+    /* Labels */
+    label.form-label {
+        font-weight: 600;
+        color: rgb(255, 195, 65);
+        text-shadow: 0 0 5px rgba(255, 195, 65, 0.8);
+    }
+
+    /* Botón */
+    button.btn-primary {
+        background: rgb(255, 195, 65);
+        border: none;
+        padding: 12px 25px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(255, 195, 65, 0.6);
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+        width: 100%;
+        max-width: 250px;
+        cursor: pointer;
+    }
+
+    button.btn-primary:hover {
+        background: #f0b740;
+        box-shadow: 0 6px 20px rgba(255, 195, 65, 0.8);
+    }
+
+    /* Links */
+    a {
+        color: rgb(255, 195, 65);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    a:hover {
+        color: #f0b740;
+        text-decoration: underline;
+    }
+
+    /* Form container */
+    form.border {
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 15px;
+        box-shadow: 0 6px 25px rgba(255,195,65,0.2);
+        padding: 30px 25px;
+    }
+
+    /* Paragraph text-muted */
+    p.text-muted {
+        color: #555 !important;
+        font-weight: 500;
+    }
+
+    /* Responsive margin */
+    @media (max-width: 767px) {
+        .row > div {
+            margin-bottom: 25px;
+        }
+    }
+</style>
 
 <!-- Sección de bienvenida -->
 <div class="container col-xl-10 col-xxl-8 px-4 py-5">
     <div class="row align-items-center g-lg-5 py-5">
         <div class="col-lg-7 text-center text-lg-start">
-            <h1 class="display-4 fw-bold  mb-3 fst-italic">{% block title %}Registrate en BLOG POSTS{% endblock %}</h1>
+            <h1 class="display-4 fw-bold mb-3 fst-italic">{% block title %}Registrate en BLOG POSTS{% endblock %}</h1>
 
             <p class="col-lg-10 fs-4">Aquí podrás compartir tus ideas, pensamientos y experiencias con una comunidad
                 global de lectores.
@@ -48,4 +157,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}

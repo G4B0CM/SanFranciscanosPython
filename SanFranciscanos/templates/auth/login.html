@@ -1,47 +1,275 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="es">
 
-{% block head %}
-<!-- Estilos de bootstrap y de app -->
-<link rel="stylesheet" href="{{ url_for('static', filename = 'css/login.css') }}">
-{% endblock %}
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Iniciar sesión - Sistema de Catequesis</title>
 
-{% block header %}
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-{% endblock %}
+    <style>
+        /* Estilos base (mismo esquema que antes) */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fffaf0;
+            color: #4b4b4b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
 
-{% block content %}
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(90deg, #ffc341 0%, #fff3cd 100%);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
 
+        .navbar-dark .navbar-brand {
+            color: #5c4400;
+            font-weight: 700;
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
 
-<!-- Login -->
-<section class="login">
-    <main class="form-signin w-100 m-auto text-center">
-        <img class="mb-4" src="../img/bp-dark.png" alt="" width="72">
-        <h1 class="h3 mb-3 fw-normal">{% block title %}Iniciar sesión{% endblock %}</h1>
-        <form method="post">
-            <div class="form-floating">
-                <input type="email" class="form-control" id="email" name="email" required
-                    placeholder="name@example.com">
-                <label for="email">Correo</label>
+        .navbar-dark .navbar-brand:hover {
+            color: #3e2d00;
+        }
+
+        .navbar-dark .nav-link {
+            color: #5c4400;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .navbar-dark .nav-link.active,
+        .navbar-dark .nav-link:hover {
+            color: #3e2d00;
+        }
+
+        .dropdown-menu {
+            background-color: #fff8e1;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            border-radius: 0 0 8px 8px;
+        }
+
+        .dropdown-item {
+            color: #5c4400;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-item:focus {
+            background-color: #ffdd7f;
+            color: #3e2d00;
+        }
+
+        .navbar-toggler {
+            border-color: #ffcb63;
+        }
+
+        .navbar-toggler-icon {
+            filter: brightness(0) invert(1);
+        }
+
+        footer {
+            background-color: #fff3cd;
+            color: #5c4400;
+            font-weight: 600;
+            box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
+            margin-top: auto;
+        }
+
+        /* LOGIN */
+
+        section.login {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
+            background: #fffaf0;
+        }
+
+        main.form-signin {
+            max-width: 360px;
+            padding: 2rem;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 8px 16px rgba(255, 195, 65, 0.3);
+        }
+
+        main.form-signin img.mb-4 {
+            filter: brightness(0) saturate(100%) invert(21%) sepia(97%) saturate(667%) hue-rotate(3deg) brightness(97%) contrast(89%);
+            /* Esto da un color oscuro al logo */
+        }
+
+        h1.h3.mb-3 {
+            color: #5c4400;
+            font-weight: 700;
+            margin-bottom: 1.5rem !important;
+        }
+
+        .form-floating > input {
+            border-radius: 8px;
+        }
+
+        .form-floating > label {
+            color: #a47a00;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background-color: #ffc341;
+            border-color: #e6b333;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+            color: #3e2d00;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background-color: #e6b333;
+            border-color: #cca52d;
+            color: #2a1f00;
+        }
+
+        .checkbox label {
+            font-weight: 600;
+            color: #5c4400;
+        }
+
+        hr.my-4 {
+            border-color: #ffd966;
+        }
+
+        p.text-muted {
+            color: #8c6e00 !important;
+        }
+
+        p.text-muted a {
+            color: #b58c00;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        p.text-muted a:hover {
+            color: #7a6600;
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            main.form-signin {
+                max-width: 90%;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Catequesis App</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Inicio</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Ingresar Ficha</a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownPersons" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Personas
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownPersons">
+                            <li><a class="dropdown-item" href="#">Catequistas</a></li>
+                            <li><a class="dropdown-item" href="#">Ayudantes</a></li>
+                            <li><a class="dropdown-item" href="#">Eclesiásticos</a></li>
+                            <li><a class="dropdown-item" href="#">Padrinos</a></li>
+                            <li><a class="dropdown-item" href="#">Padres/Madres</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Niveles</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Sacramentos</a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownInstitutions" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Instituciones
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownInstitutions">
+                            <li><a class="dropdown-item" href="#">Arquidiócesis</a></li>
+                            <li><a class="dropdown-item" href="#">Vicarías</a></li>
+                            <li><a class="dropdown-item" href="#">Parroquias</a></li>
+                        </ul>
+                    </li>
+
+                </ul>
             </div>
-            <div class="form-floating">
-                <input type="password" class="form-control" id="password" name="password" required
-                    placeholder="Password">
-                <label for="password">Contraseña</label>
-            </div>
+        </div>
+    </nav>
 
-            <div class="checkbox mb-3">
-                <label>
-                    <input type="checkbox" value="remember-me"> Recordar datos
-                </label>
-            </div>
-            <button class="w-100 btn btn-lg btn-primary" type="submit">Iniciar sesion</button>
-        </form>
-        <hr class="my-4">
-        <p class="text-muted text-center">Si n tienes una cuenta en BLOG-POSTS haz clic en
-            <a href="{{ url_for('auth.register') }}">Crear cuenta</a>
-        </p>
-    </main>
-</section>
+    <!-- Contenido Login -->
+    <section class="login">
+        <main class="form-signin w-100 m-auto text-center">
+            <img class="mb-4" src="../img/bp-dark.png" alt="Logo" width="72">
+            <h1 class="h3 mb-3 fw-normal">Iniciar sesión</h1>
+            <form method="post">
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="email" name="email" required placeholder="name@example.com">
+                    <label for="email">Correo</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="password" name="password" required placeholder="Password">
+                    <label for="password">Contraseña</label>
+                </div>
 
+                <div class="checkbox mb-3 text-start">
+                    <label>
+                        <input type="checkbox" value="remember-me"> Recordar datos
+                    </label>
+                </div>
+                <button class="w-100 btn btn-lg btn-primary" type="submit">Iniciar sesión</button>
+            </form>
+            <hr class="my-4">
+            <p class="text-muted text-center">Si no tienes una cuenta en BLOG-POSTS haz clic en
+                <a href="#">Crear cuenta</a>
+            </p>
+        </main>
+    </section>
 
-{% endblock %}
+    <footer class="bg-light text-center text-lg-start mt-auto py-3">
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+            © 2025 Sistema de Catequesis
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
