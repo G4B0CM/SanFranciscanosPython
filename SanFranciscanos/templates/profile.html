@@ -1,3 +1,55 @@
+{% block style %}
+<style>
+  body {
+    background: linear-gradient(to right, #fff8e1, #fff3cd);
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  h1 {
+    color: rgb(255, 195, 65);
+    text-shadow: 0 2px 6px rgba(255, 195, 65, 0.4);
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .profile-card {
+    max-width: 500px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 6px 20px rgba(255, 195, 65, 0.3);
+    text-align: center;
+  }
+
+  .profile-card p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .btn-edit {
+    background: linear-gradient(135deg, rgb(255, 195, 65), rgb(255, 180, 50));
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(255, 195, 65, 0.4);
+    transition: all 0.3s ease-in-out;
+    display: inline-block;
+  }
+
+  .btn-edit:hover {
+    background: linear-gradient(135deg, rgb(255, 180, 50), rgb(255, 195, 65));
+    box-shadow: 0 6px 20px rgba(255, 195, 65, 0.6);
+    text-decoration: none;
+  }
+</style>
+{% endblock %}
+
+
 <h1>Perfil de {{ user.username }}</h1>
 <p>Bio: {{ user.bio }}</p>
 <a href="{{ url_for('profile.edit_profile') }}">Editar Perfil</a>
