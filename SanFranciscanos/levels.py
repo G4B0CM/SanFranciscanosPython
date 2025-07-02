@@ -2,12 +2,12 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from sqlalchemy import text
 from .forms import LevelForm, DeleteForm
 import datetime
+from SanFranciscanos.db import SessionLocal  # Importar la sesión de la base de datos
 
 bp = Blueprint('Levels', __name__, url_prefix='/Levels')
 
 @bp.route('/')
 def index():
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         levels = session.execute(text("SELECT * FROM Levels.vw_ListLevels")).fetchall()
@@ -32,7 +32,6 @@ def create_level():
         params['updatedAt'] = datetime.datetime.utcnow()
         params['state'] = 'Activo'
 
-        SessionLocal = current_app.SessionLocal
         session = SessionLocal()
         try:
             sql = ("EXEC Levels.sp_InsertLevel "
@@ -53,7 +52,6 @@ def create_level():
 @bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_level(id):
     form = LevelForm()
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         result = session.execute(
@@ -94,7 +92,6 @@ def edit_level(id):
 
 @bp.route('/delete/<int:id>', methods=['POST'])
 def delete_level(id):
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         sql = text("EXEC Levels.sp_DeleteLevel @idLevelToDelete = :id")
@@ -111,7 +108,6 @@ def delete_level(id):
 
 @bp.route('/<int:id>')
 def detail_level(id):
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         query = text("SELECT * FROM Levels.vw_ListLevels WHERE idLevel = :id")

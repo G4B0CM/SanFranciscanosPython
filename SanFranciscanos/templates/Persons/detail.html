@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head_extra %}
+<style>
+    .detail-card {
+        max-width: 700px;
+        margin: 2rem auto;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.9));
+        border-radius: 20px;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 195, 65, 0.3);
+    }
+
+    .detail-header {
+        background: linear-gradient(to right, rgb(255, 195, 65), rgb(255, 180, 40));
+        color: white;
+        padding: 1.25rem 1.5rem;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .detail-header h2 {
+        margin-bottom: 0;
+        font-size: 1.75rem;
+    }
+
+    .list-group-item {
+        background-color: transparent;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+
+    .list-group-item strong {
+        color: #343a40;
+        font-weight: 600;
+    }
+
+    .detail-value {
+        text-align: right;
+        color: #555;
+    }
+
+    .detail-footer {
+        padding: 1.5rem;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-card">
+    <div class="detail-header">
+        <h2>{{ title }}</h2>
+    </div>
+
+    {% if detail_items %}
+    <ul class="list-group list-group-flush">
+        <!-- Iterar sobre una lista de tuplas (etiqueta, valor) -->
+        {% for label, value in detail_items %}
+        <li class="list-group-item">
+            <strong>{{ label }}:</strong>
+            <span class="detail-value">
+                <!-- Mostrar el valor, o 'No especificado' si es nulo o vacío -->
+                {{ value if value not in [none, ''] else 'No especificado' }}
+            </span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="p-4 text-center">
+        <div class="alert alert-warning" role="alert">
+            No se encontraron detalles para este registro.
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="detail-footer">
+        <a href="{{ url_for('Persons.list_persons', role=role) }}" class="btn btn-secondary">Volver a la Lista</a>
+    </div>
+</div>
+{% endblock %}

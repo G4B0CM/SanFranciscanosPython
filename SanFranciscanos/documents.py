@@ -3,13 +3,12 @@ from sqlalchemy import text, select
 from .forms import DataSheetForm,DeleteForm
 from .models import Institution, Parroquia, Level, DataSheet, Catequizado, Person, Parent # Importar los modelos necesarios
 import datetime
-
+from SanFranciscanos.db import SessionLocal 
 
 bp = Blueprint('Documents', __name__, url_prefix='/Documents') 
 
 # --- FUNCIÓN AUXILIAR PARA CARGAR OPCIONES DE SELECTS (REUTILIZABLE) ---
 def load_select_field_options(form):
-    SessionLocal = current_app.SessionLocal
     db_session = SessionLocal()
     try:
         # Cargar Parroquias
@@ -62,7 +61,6 @@ def new_data_sheet():
             "ds_idLevel": form.ds_idLevel.data if form.ds_idLevel.data else None,
             "ds_schoolsName": form.ds_schoolsName.data, "ds_schoolGrade": form.ds_schoolGrade.data,
         }
-        SessionLocal = current_app.SessionLocal
         session = SessionLocal()
         try:
             sql_query = text("""
@@ -107,7 +105,6 @@ def new_data_sheet():
 
 @bp.route('/update/<int:datasheet_id>', methods=['GET', 'POST'])
 def update_data_sheet(datasheet_id):
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     
     
@@ -266,7 +263,6 @@ def index():
 
 @bp.route('/list')
 def list_data_sheets():
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         query = text("""
@@ -294,7 +290,6 @@ def list_data_sheets():
 
 @bp.route('/delete/<int:datasheet_id>', methods=['POST'])
 def delete_data_sheet(datasheet_id):
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
 

@@ -13,7 +13,8 @@
         /* Estilos incluidos directamente en el HTML */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #fffaf0; /* fondo suave */
+            background-color: #fffaf0;
+            /* fondo suave */
             color: #4b4b4b;
             min-height: 100vh;
             display: flex;
@@ -128,27 +129,37 @@
                 <ul class="navbar-nav">
 
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'home.index' %}active{% endif %}" href="{{ url_for('home.index') }}">
+                        <a class="nav-link {% if request.endpoint == 'home.index' %}active{% endif %}"
+                            href="{{ url_for('home.index') }}">
                             Inicio
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'Documents.new_data_sheet' %}active{% endif %}" href="{{ url_for('Documents.new_data_sheet') }}">
+                        <a class="nav-link {% if request.endpoint == 'Documents.new_data_sheet' %}active{% endif %}"
+                            href="{{ url_for('Documents.new_data_sheet') }}">
                             Ingresar Ficha
                         </a>
                     </li>
 
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="dropdownPersons" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownPersons" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             Personas
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdownPersons">
-                            <li><a class="dropdown-item" href="{{ url_for('Persons.list_persons', role='Catequista') }}">Catequistas</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('Persons.list_persons', role='Ayudante') }}">Ayudantes</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('Persons.list_persons', role='Eclesiastico') }}">Eclesiásticos</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('Persons.list_persons', role='Padrino') }}">Padrinos</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('Persons.list_persons', role='PadreMadre') }}">Padres/Madres</a></li>
+                            <li><a class="dropdown-item"
+                                    href="{{ url_for('Persons.list_persons', role='Catequista') }}">Catequistas</a></li>
+                            <li><a class="dropdown-item"
+                                    href="{{ url_for('Persons.list_persons', role='Ayudante') }}">Ayudantes</a></li>
+                            <li><a class="dropdown-item"
+                                    href="{{ url_for('Persons.list_persons', role='Eclesiastico') }}">Eclesiásticos</a>
+                            </li>
+                            <li><a class="dropdown-item"
+                                    href="{{ url_for('Persons.list_persons', role='Padrino') }}">Padrinos</a></li>
+                            <li><a class="dropdown-item"
+                                    href="{{ url_for('Persons.list_persons', role='PadreMadre') }}">Padres/Madres</a>
+                            </li>
                         </ul>
                     </li>
 
@@ -161,13 +172,20 @@
                     </li>
 
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="dropdownInstitutions" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownInstitutions" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             Instituciones
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdownInstitutions">
-                            <li><a class="dropdown-item" href="{{ url_for('Institutions.list_institution', institution_type='Arquidiocesis') }}">Arquidiócesis</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('Institutions.list_institution', institution_type='Vicaria') }}">Vicarías</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('Institutions.list_institution', institution_type='Parroquia') }}">Parroquias</a></li>
+                            <li><a class="dropdown-item"
+                                    href="{{ url_for('Institutions.list_institution', institution_type='Arquidiocesis') }}">Arquidiócesis</a>
+                            </li>
+                            <li><a class="dropdown-item"
+                                    href="{{ url_for('Institutions.list_institution', institution_type='Vicaria') }}">Vicarías</a>
+                            </li>
+                            <li><a class="dropdown-item"
+                                    href="{{ url_for('Institutions.list_institution', institution_type='Parroquia') }}">Parroquias</a>
+                            </li>
                         </ul>
                     </li>
 
@@ -200,6 +218,7 @@
     <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     {% block scripts_extra %}{% endblock %}
+    {{ moment.include_moment() }}
 </body>
 
 </html>

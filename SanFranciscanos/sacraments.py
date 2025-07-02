@@ -3,12 +3,12 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from sqlalchemy import text
 from .forms import SacramentForm, DeleteForm
 import datetime
+from SanFranciscanos.db import SessionLocal  # Importar la sesión de la base de datos
 
 bp = Blueprint('Sacraments', __name__, url_prefix='/Sacraments')
 
 @bp.route('/')
 def index():
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         sacraments = session.execute(text("SELECT * FROM Sacraments.vw_ListSacrament")).fetchall()
@@ -29,7 +29,6 @@ def new():
         params['createdAt'] = datetime.datetime.utcnow()
         params['updatedAt'] = datetime.datetime.utcnow()
         params['state'] = 'Activo'
-        SessionLocal = current_app.SessionLocal
         session = SessionLocal()
         try:
             sql = ("EXEC Sacraments.sp_InsertSacrament @name = :name, "
@@ -49,7 +48,6 @@ def new():
 @bp.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit(id):
     form = SacramentForm()
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         result = session.execute(text("SELECT * FROM Sacraments.vw_ListSacrament WHERE idSacrament = :id"), {"id": id}).fetchone()
@@ -83,7 +81,6 @@ def edit(id):
 
 @bp.route('/delete/<int:id>', methods=['POST'])
 def delete(id):
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         sql = text("EXEC Sacraments.sp_DeleteSacrament @idSacramentToDelete = :id")
@@ -100,7 +97,6 @@ def delete(id):
 
 @bp.route('/<int:sacrament_id>')
 def detail(sacrament_id):
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     sacrament = session.execute(text("SELECT * FROM Sacraments.vw_ListSacrament WHERE idSacrament = :id"), {'id': sacrament_id}).fetchone()
     session.close()

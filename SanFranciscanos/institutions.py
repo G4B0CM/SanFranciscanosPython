@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from sqlalchemy import text
 from .forms import ArquidiocesisForm, VicariaForm, ParroquiaForm, DeleteForm
 import datetime
+from SanFranciscanos.db import SessionLocal  # Importar la sesión de la base de datos
 
 bp = Blueprint('Institutions', __name__, url_prefix='/Institutions')
 
@@ -20,7 +21,6 @@ def index():
 
 @bp.route('/list/<institution_type>')
 def list_institution(institution_type):
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         query = text(f"SELECT * FROM Institutions.vw_List{institution_type}s")
@@ -46,7 +46,6 @@ def new_institution(institution_type):
         params['createdAt'] = datetime.datetime.utcnow()
         params['updatedAt'] = datetime.datetime.utcnow()
         params['state'] = 'Activo'
-        SessionLocal = current_app.SessionLocal
         session = SessionLocal()
         try:
             sql = f"EXEC Institutions.{sp_name} " + ", ".join([f"@{k} = :{k}" for k in params.keys()])
@@ -69,7 +68,6 @@ def edit_institution(institution_type, id):
         flash('Tipo de institución no reconocido.', 'danger')
         return redirect(url_for('Institutions.index'))
 
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         query = text(f"SELECT * FROM Institutions.vw_List{institution_type}s WHERE id{institution_type} = :id")
@@ -104,7 +102,6 @@ def edit_institution(institution_type, id):
 
 @bp.route('/delete/<institution_type>/<int:id>', methods=['POST'])
 def delete_institution(institution_type, id):
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         sp_delete = f"sp_Delete{institution_type}"
@@ -122,7 +119,6 @@ def delete_institution(institution_type, id):
 
 @bp.route('/<institution_type>/<int:id>')
 def detail_institution(institution_type, id):
-    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         query = text(f"SELECT * FROM Institutions.vw_List{institution_type}s WHERE id{institution_type} = :id")
