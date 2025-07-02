@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Detalle del Curso{% endblock %}
+
+{% block content %}
+<h2>Detalle del Curso</h2>
+
+<ul class="list-group mb-4">
+    <li class="list-group-item"><strong>Nombre:</strong> {{ course.name }}</li>
+    <li class="list-group-item"><strong>Parroquia:</strong> {{ course.idParroquia }}</li>
+    <li class="list-group-item"><strong>Catequista:</strong> {{ course.idCatequista }}</li>
+    <li class="list-group-item"><strong>Nivel:</strong> {{ course.idLevel }}</li>
+    <li class="list-group-item"><strong>Fecha Inicio:</strong> {{ course.startDate }}</li>
+    <li class="list-group-item"><strong>Fecha Fin:</strong> {{ course.endDate }}</li>
+</ul>
+
+<a href="{{ url_for('Courses.edit', id=course._id) }}" class="btn btn-warning">Editar</a>
+<a href="{{ url_for('Courses.index') }}" class="btn btn-secondary">Volver</a>
+{% endblock %}

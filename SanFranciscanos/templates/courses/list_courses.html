@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Lista de Cursos{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Cursos Registrados</h2>
+
+<a href="{{ url_for('Courses.new') }}" class="btn btn-success mb-3">Nuevo Curso</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Parroquia</th>
+            <th>Catequista</th>
+            <th>Nivel</th>
+            <th>Fechas</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for course in courses %}
+        <tr>
+            <td>{{ course.name }}</td>
+            <td>{{ course.idParroquia }}</td>
+            <td>{{ course.idCatequista }}</td>
+            <td>{{ course.idLevel }}</td>
+            <td>{{ course.startDate }} al {{ course.endDate }}</td>
+            <td>
+                <a href="{{ url_for('Courses.detail', id=course._id) }}" class="btn btn-sm btn-primary">Ver</a>
+                <a href="{{ url_for('Courses.edit', id=course._id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form method="post" action="{{ url_for('Courses.delete', id=course._id) }}" style="display:inline;">
+                    {{ delete_form.hidden_tag() }}
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar curso?')">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

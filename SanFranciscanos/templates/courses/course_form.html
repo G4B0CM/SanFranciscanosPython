@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">{{ title }}</h2>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+        {{ form.name.label(class="form-label") }}
+        {{ form.name(class="form-control") }}
+        {% for error in form.name.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-3">
+        {{ form.idParroquia.label(class="form-label") }}
+        {{ form.idParroquia(class="form-control") }}
+        {% for error in form.idParroquia.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-3">
+        {{ form.idCatequista.label(class="form-label") }}
+        {{ form.idCatequista(class="form-control") }}
+        {% for error in form.idCatequista.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-3">
+        {{ form.idLevel.label(class="form-label") }}
+        {{ form.idLevel(class="form-control") }}
+        {% for error in form.idLevel.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-3">
+        {{ form.startDate.label(class="form-label") }}
+        {{ form.startDate(class="form-control") }}
+        {% for error in form.startDate.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-3">
+        {{ form.endDate.label(class="form-label") }}
+        {{ form.endDate(class="form-control") }}
+        {% for error in form.endDate.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+    <a href="{{ url_for('Courses.index') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

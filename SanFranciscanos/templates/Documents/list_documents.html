@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Lista de Documentos{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Lista de Documentos</h2>
+
+<a href="{{ url_for('Documents.new') }}" class="btn btn-success mb-3">Nuevo Documento</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Categoría</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for doc in documents %}
+        <tr>
+            <td>{{ doc.name }}</td>
+            <td>{{ doc.type }}</td>
+            <td>{{ doc.category }}</td>
+            <td>{{ doc.state }}</td>
+            <td>
+                <a href="{{ url_for('Documents.detail', id=doc._id) }}" class="btn btn-sm btn-primary">Ver</a>
+                <a href="{{ url_for('Documents.edit', id=doc._id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form action="{{ url_for('Documents.delete', id=doc._id) }}" method="post" style="display:inline;">
+                    {{ delete_form.hidden_tag() }}
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este documento?')">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

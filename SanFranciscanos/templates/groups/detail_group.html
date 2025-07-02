@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Detalle de la Inscripción{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Detalle de la Inscripción</h2>
+
+<ul class="list-group mb-4">
+    <li class="list-group-item"><strong>Nombre del Catequizado:</strong> {{ catequizado.c_firstName }} {{ catequizado.c_lastName }}</li>
+    <li class="list-group-item"><strong>Curso:</strong> {{ curso.name }}</li>
+    <li class="list-group-item"><strong>Fecha de Inscripción:</strong> {{ grupo.fechaInscripcion.strftime('%d/%m/%Y') }}</li>
+    <li class="list-group-item"><strong>Creado en:</strong> {{ grupo.createdAt }}</li>
+    <li class="list-group-item"><strong>Última Actualización:</strong> {{ grupo.updatedAt }}</li>
+</ul>
+
+<a href="{{ url_for('Groups.index') }}" class="btn btn-secondary">Volver</a>
+{% endblock %}

@@ -1,7 +1,7 @@
 # Archivo: sacraments.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from sqlalchemy import text
-from .forms import SacramentForm, DeleteForm
+from SanFranciscanos.forms import SacramentForm, DeleteForm
 import datetime
 
 bp = Blueprint('Sacraments', __name__, url_prefix='/Sacraments')

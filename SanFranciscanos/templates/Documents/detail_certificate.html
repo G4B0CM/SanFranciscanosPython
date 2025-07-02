@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Detalle del Certificado{% endblock %}
+
+{% block content %}
+<h2>Detalle del Certificado</h2>
+
+<ul class="list-group mb-4">
+    <li class="list-group-item"><strong>ID Catequizado:</strong> {{ certificate.idCatequizado }}</li>
+    <li class="list-group-item"><strong>ID Sacramento:</strong> {{ certificate.idSacramento }}</li>
+    <li class="list-group-item"><strong>Fecha de Emisión:</strong> {{ certificate.fechaEmision }}</li>
+    <li class="list-group-item"><strong>Lugar:</strong> {{ certificate.lugar }}</li>
+    <li class="list-group-item"><strong>Observaciones:</strong> {{ certificate.observaciones }}</li>
+    <li class="list-group-item"><strong>Estado:</strong> {{ certificate.state }}</li>
+    <li class="list-group-item"><strong>Creado en:</strong> {{ certificate.createdAt }}</li>
+    <li class="list-group-item"><strong>Actualizado en:</strong> {{ certificate.updatedAt }}</li>
+</ul>
+
+<a href="{{ url_for('Certificates.edit_certificate', id=certificate._id) }}" class="btn btn-warning">Editar</a>
+<a href="{{ url_for('Certificates.index') }}" class="btn btn-secondary">Volver</a>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalle de Asistencia</h2>
+    <ul class="list-group">
+        <li class="list-group-item"><strong>ID Curso:</strong> {{ attendance.idCurso }}</li>
+        <li class="list-group-item"><strong>ID Catequizado:</strong> {{ attendance.idCatequizado }}</li>
+        <li class="list-group-item"><strong>Fecha:</strong> {{ attendance.date.strftime('%Y-%m-%d') if attendance.date }}</li>
+        <li class="list-group-item"><strong>¿Asistió?:</strong> {{ 'Sí' if attendance.present else 'No' }}</li>
+    </ul>
+    <a href="{{ url_for('Attendances.index') }}" class="btn btn-secondary mt-3">Volver al listado</a>
+</div>
+{% endblock %}

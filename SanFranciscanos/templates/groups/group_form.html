@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">{{ title }}</h2>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+        {{ form.idCatequizado.label(class="form-label") }}
+        {{ form.idCatequizado(class="form-control") }}
+        {% for error in form.idCatequizado.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-3">
+        {{ form.idCurso.label(class="form-label") }}
+        {{ form.idCurso(class="form-control") }}
+        {% for error in form.idCurso.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-3">
+        {{ form.fechaInscripcion.label(class="form-label") }}
+        {{ form.fechaInscripcion(class="form-control", type="date") }}
+        {% for error in form.fechaInscripcion.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="{{ url_for('Groups.index') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

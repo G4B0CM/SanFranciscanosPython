@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">{{ title }}</h2>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form.c_firstName.label(class="form-label") }}
+            {{ form.c_firstName(class="form-control") }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form.c_secondName.label(class="form-label") }}
+            {{ form.c_secondName(class="form-control") }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form.c_lastName.label(class="form-label") }}
+            {{ form.c_lastName(class="form-control") }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form.c_secondLastName.label(class="form-label") }}
+            {{ form.c_secondLastName(class="form-control") }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form.c_sex.label(class="form-label") }}
+            {{ form.c_sex(class="form-control") }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form.c_birthdate.label(class="form-label") }}
+            {{ form.c_birthdate(class="form-control") }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form.c_bloodType.label(class="form-label") }}
+            {{ form.c_bloodType(class="form-control") }}
+        </div>
+        <div class="col-md-12 mb-3">
+            {{ form.c_alergies.label(class="form-label") }}
+            {{ form.c_alergies(class="form-control") }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form.c_emergencyContactName.label(class="form-label") }}
+            {{ form.c_emergencyContactName(class="form-control") }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form.c_emergencyContactPhone.label(class="form-label") }}
+            {{ form.c_emergencyContactPhone(class="form-control") }}
+        </div>
+        <div class="col-md-12 mb-3">
+            {{ form.c_details.label(class="form-label") }}
+            {{ form.c_details(class="form-control", rows="3") }}
+        </div>
+
+        <hr class="my-4">
+        <h5>Información Adicional</h5>
+
+        <div class="col-md-4 mb-3">
+            {{ form.ds_sonNumbr.label(class="form-label") }}
+            {{ form.ds_sonNumbr(class="form-control") }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form.ds_numbrBrothers.label(class="form-label") }}
+            {{ form.ds_numbrBrothers(class="form-control") }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form.ds_livesWith.label(class="form-label") }}
+            {{ form.ds_livesWith(class="form-control") }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form.ds_residentialPhone.label(class="form-label") }}
+            {{ form.ds_residentialPhone(class="form-control") }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form.ds_mainAddress.label(class="form-label") }}
+            {{ form.ds_mainAddress(class="form-control") }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form.ds_schoolsName.label(class="form-label") }}
+            {{ form.ds_schoolsName(class="form-control") }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form.ds_schoolGrade.label(class="form-label") }}
+            {{ form.ds_schoolGrade(class="form-control") }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form.ds_idLevel.label(class="form-label") }}
+            {{ form.ds_idLevel(class="form-control") }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form.ds_idInstitution.label(class="form-label") }}
+            {{ form.ds_idInstitution(class="form-control") }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form.ds_idCertificate.label(class="form-label") }}
+            {{ form.ds_idCertificate(class="form-control") }}
+        </div>
+
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="{{ url_for('Students.index') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

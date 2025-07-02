@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h2>{{ title }}</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Ubicación</th>
+            <th>Contacto</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for i in institutions %}
+        <tr>
+            <td>{{ i.name }}</td>
+            <td>{{ i.type }}</td>
+            <td>{{ i.location }}</td>
+            <td>{{ i.contact }}</td>
+            <td>
+                <a href="{{ url_for('Institutions.detail', id=i._id) }}" class="btn btn-info btn-sm">Ver</a>
+                <a href="{{ url_for('Institutions.edit', id=i._id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <form method="POST" action="{{ url_for('Institutions.delete', id=i._id) }}" style="display:inline;">
+                    {{ delete_form.hidden_tag() }}
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<a href="{{ url_for('Institutions.new') }}" class="btn btn-success">Nueva Institución</a>
+{% endblock %}

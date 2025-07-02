@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ title }}</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+            {{ form.idCurso.label(class="form-label") }}
+            {{ form.idCurso(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.idCatequizado.label(class="form-label") }}
+            {{ form.idCatequizado(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.date.label(class="form-label") }}
+            {{ form.date(class="form-control") }}
+        </div>
+        <div class="form-check mb-3">
+            {{ form.present(class="form-check-input") }}
+            {{ form.present.label(class="form-check-label") }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+        <a href="{{ url_for('Attendances.index') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

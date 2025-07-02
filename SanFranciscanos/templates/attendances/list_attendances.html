@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Listado de Asistencias</h2>
+    <a href="{{ url_for('Attendances.new') }}" class="btn btn-success mb-3">Registrar Nueva Asistencia</a>
+    {% if attendances %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID Curso</th>
+                <th>ID Catequizado</th>
+                <th>Fecha</th>
+                <th>Asistió</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for attendance in attendances %}
+            <tr>
+                <td>{{ attendance.idCurso }}</td>
+                <td>{{ attendance.idCatequizado }}</td>
+                <td>{{ attendance.date.strftime('%Y-%m-%d') if attendance.date }}</td>
+                <td>{{ 'Sí' if attendance.present else 'No' }}</td>
+                <td>
+                    <a href="{{ url_for('Attendances.detail', id=attendance._id) }}" class="btn btn-info btn-sm">Ver</a>
+                    <a href="{{ url_for('Attendances.edit', id=attendance._id) }}" class="btn btn-warning btn-sm">Editar</a>
+                    <form method="POST" action="{{ url_for('Attendances.delete', id=attendance._id) }}" style="display:inline;">
+                        {{ delete_form.hidden_tag() }}
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este registro?')">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No hay registros de asistencia aún.</p>
+    {% endif %}
+</div>
+{% endblock %}

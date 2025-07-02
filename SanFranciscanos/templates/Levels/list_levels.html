@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>{{ title }}</h2>
-<a href="{{ url_for('Levels.create_level') }}" class="btn btn-success">Nuevo Nivel</a>
+<a href="{{ url_for('Levels.new') }}" class="btn btn-success">Nuevo Nivel</a>
 <table>
     <thead>
         <tr><th>Nombre</th><th>Descripción</th><th>Orden</th><th>Acciones</th></tr>
@@ -14,9 +14,10 @@
             <td>{{ level.description }}</td>
             <td>{{ level.order }}</td>
             <td>
-                <a href="{{ url_for('Levels.edit_level', id=level.idLevel) }}">Editar</a>
-                <a href="{{ url_for('Levels.detail_level', id=level.idLevel) }}">Detalles</a>
-                <form method="post" action="{{ url_for('Levels.delete_level', id=level.idLevel) }}" style="display:inline;">
+                <a href="{{ url_for('Levels.edit', id=level._id) }}">Editar</a>
+                <a href="{{ url_for('Levels.detail', id=level._id) }}">Detalles</a>
+                <form method="post" action="{{ url_for('Levels.delete', id=level._id) }}" style="display:inline;">
+
                     {{ delete_form.hidden_tag() }}
                     <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                 </form>

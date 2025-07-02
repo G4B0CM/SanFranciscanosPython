@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Panel de Control{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">📊 Panel de Control SanFranciscanos</h1>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for label, value in stats.items() %}
+        <div class="col">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-capitalize">{{ label.replace('_', ' ') }}</h5>
+                    <p class="card-text display-6">{{ value }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Grupos Registrados{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Grupos Registrados</h2>
+<a href="{{ url_for('Groups.new') }}" class="btn btn-success mb-3">Nueva Inscripción</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Catequizado</th>
+            <th>Curso</th>
+            <th>Fecha de Inscripción</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for grupo in grupos %}
+        <tr>
+            <td>{{ catequizados[grupo.idCatequizado|string] }}</td>
+            <td>{{ cursos[grupo.idCurso|string] }}</td>
+            <td>{{ grupo.fechaInscripcion.strftime('%d/%m/%Y') }}</td>
+            <td>
+                <a href="{{ url_for('Groups.detail', id=grupo._id) }}" class="btn btn-primary btn-sm">Ver</a>
+                <a href="{{ url_for('Groups.edit', id=grupo._id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <form method="POST" action="{{ url_for('Groups.delete', id=grupo._id) }}" style="display:inline;">
+                    {{ delete_form.hidden_tag() }}
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Desea eliminar esta inscripción?')">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

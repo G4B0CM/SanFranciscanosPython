@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Lista de Catequizados{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Catequizados</h2>
+
+<a href="{{ url_for('Students.new') }}" class="btn btn-success mb-3">Nuevo Catequizado</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Sexo</th>
+            <th>Fecha de Nacimiento</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.firstName }} {{ student.secondName }}</td>
+            <td>{{ student.lastName }} {{ student.secondLastName }}</td>
+            <td>{{ student.sex }}</td>
+            <td>{{ student.birthdate }}</td>
+            <td>
+                <a href="{{ url_for('Students.detail', id=student._id) }}" class="btn btn-sm btn-primary">Ver</a>
+                <a href="{{ url_for('Students.edit', id=student._id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form method="post" action="{{ url_for('Students.delete', id=student._id) }}" style="display:inline;">
+                    {{ delete_form.hidden_tag() }}
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Deseas eliminar este catequizado?')">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
