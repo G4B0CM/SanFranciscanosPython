@@ -30,6 +30,7 @@ def create_app():
             f"mssql+pyodbc://{USERNAME}:{PASSWORD}@{NAME_SERVER}/{DATABASE}?"
             f"driver=ODBC+Driver+17+for+SQL+Server"
             "&TrustServerCertificate=yes"
+            "&charset=utf8"  # <-- AÑADIR ESTA LÍNEA
         )
     else:
         CONNECTION_STRING = (
@@ -37,6 +38,7 @@ def create_app():
             f"driver=ODBC+Driver+17+for+SQL+Server"
             "&Trusted_Connection=yes"
             "&TrustServerCertificate=yes"
+            "&charset=utf8"  # <-- AÑADIR ESTA LÍNEA
         )
 
     print(f"Intentando conectar con: {CONNECTION_STRING.replace(PASSWORD, '****') if PASSWORD else CONNECTION_STRING}")

@@ -174,27 +174,32 @@ def index():
 @bp.route('/list/<role>')
 def list_items(role):
     role_details = get_item_details(role)
-    if not role_details:
-        abort(404)
-        
+    if not role_details: abort(404)
+    
     SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
-        stmt = text(f"SELECT * FROM Documents.{role_details['view']}")
+        if role == 'Payment':
+            # SOLUCIÓN: Hacemos un "CAST" de la columna DECIMAL a FLOAT para evitar el bug del driver.
+            # Nota: Usa el nombre de columna que dejaste en tu VISTA (Metodo o Método)
+            stmt = text("""
+                SELECT ID, idCatequizado, [Nombre Catequizado], [Apellido Catequizado], 
+                       CAST(Monto AS FLOAT) AS Monto, 
+                       [Fecha Pago], Metodo, Estado 
+                FROM Documents.v_InfoPayment
+            """)
+        else:
+            # Lógica original para todos los demás roles que sí funcionan
+            stmt = text(f"SELECT * FROM Documents.{role_details['view']}")
         
-        # --- LÍNEA CORREGIDA ---
-        # Se elimina el segundo argumento `{}` cuando no hay parámetros.
         results = session.execute(stmt).mappings().all()
 
     finally:
         session.close()
         
-    return render_template('Documents/list.html', 
-                           items=results, 
-                           headers=role_details['list_headers'], 
-                           role=role, 
-                           delete_form=DeleteForm(), 
-                           title=f"Lista de {role}s")
+    return render_template('Documents/list.html', items=results,
+                            headers=role_details['list_headers'], role=role, 
+                            delete_form=DeleteForm(), title=f"Lista de {role}s")
 
 @bp.route('/new/<role>', methods=['GET', 'POST'])
 def new_item(role):
@@ -252,7 +257,6 @@ def edit_item(role, item_id):
     role_details = get_item_details(role)
     if not role_details: abort(404)
 
-
     # Redirigir entidades complejas a sus rutas específicas
     if role == 'Attendance':
         flash('La edición para Asistencia tiene una ruta especial.', 'info')
@@ -266,8 +270,22 @@ def edit_item(role, item_id):
     
     try:
         id_column_name = role_details['list_headers'][0]
-        # Asegúrate que las vistas tengan todas las columnas de ID necesarias para el field_map
-        query = text(f"SELECT * FROM Documents.{role_details['view']} WHERE \"{id_column_name}\" = :id")
+        
+        # --- INICIO DE LA CORRECCIÓN ---
+        if role == 'Payment':
+            # Usamos la consulta específica con CAST para evitar el bug del driver.
+            # Nota: Usa el nombre de columna que dejaste en tu VISTA (Metodo o Método)
+            query = text(f"""
+                SELECT ID, idCatequizado, [Nombre Catequizado], [Apellido Catequizado], 
+                       CAST(Monto AS FLOAT) AS Monto, 
+                       [Fecha Pago], Metodo, Estado 
+                FROM Documents.v_InfoPayment WHERE "{id_column_name}" = :id
+            """)
+        else:
+            # Lógica original para otros roles que sí funcionan
+            query = text(f"SELECT * FROM Documents.{role_details['view']} WHERE \"{id_column_name}\" = :id")
+        # --- FIN DE LA CORRECCIÓN ---
+
         item_data_from_view = session.execute(query, {"id": item_id}).mappings().fetchone()
 
         if not item_data_from_view:
@@ -386,7 +404,22 @@ def detail_item(role, item_id):
     
     try:
         id_column_name = role_details['list_headers'][0]
-        query = text(f"SELECT * FROM Documents.{role_details['view']} WHERE \"{id_column_name}\" = :id")
+
+        # --- INICIO DE LA CORRECCIÓN ---
+        if role == 'Payment':
+            # Misma consulta con CAST para evitar el bug del driver.
+            # Nota: Usa el nombre de columna que dejaste en tu VISTA (Metodo o Método)
+            query = text(f"""
+                SELECT ID, idCatequizado, [Nombre Catequizado], [Apellido Catequizado], 
+                       CAST(Monto AS FLOAT) AS Monto, 
+                       [Fecha Pago], Metodo, Estado 
+                FROM Documents.v_InfoPayment WHERE "{id_column_name}" = :id
+            """)
+        else:
+            # Lógica original para otros roles que sí funcionan
+            query = text(f"SELECT * FROM Documents.{role_details['view']} WHERE \"{id_column_name}\" = :id")
+        # --- FIN DE LA CORRECCIÓN ---
+
         item_data = session.execute(query, {"id": item_id}).mappings().fetchone()
 
         if not item_data:
@@ -402,8 +435,7 @@ def detail_item(role, item_id):
                 elif isinstance(value, datetime.date):
                     value = value.strftime('%d-%m-%Y')
                 
-                # Para combinar nombre y apellido en el detalle
-                if label: # Si la etiqueta no está vacía
+                if label:
                     detail_items.append((label, value if value is not None else 'N/A'))
             
     finally:
@@ -413,7 +445,8 @@ def detail_item(role, item_id):
         flash("No hay detalles configurados para este tipo de documento.", "warning")
         return redirect(url_for('Documents.list_items', role=role))
 
-    return render_template('Documents/detail.html', detail_items=detail_items, title=f"Detalle de {role}", role=role)
+    return render_template('Documents/detail.html', detail_items=detail_items, 
+                           title=f"Detalle de {role}", role=role)
 
 @bp.route('/edit/DataSheet/<int:item_id>', methods=['GET', 'POST'])
 def edit_datasheet(item_id):
@@ -480,7 +513,7 @@ def detail_datasheet(item_id):
     role_details = get_item_details(role)
     if not role_details: abort(404)
         
-    SessionLocal = current_app.SessionLocal
+    SessionLocal = current_app.SessionLocal # type: ignore
     session = SessionLocal()
     detail_items = []
     
