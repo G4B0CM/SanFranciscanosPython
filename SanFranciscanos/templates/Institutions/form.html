@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% from "_form_helpers.html" import render_field %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2>{{ title }}</h2>
+            <form method="POST" action="{{ action_url }}" novalidate>
+                {{ form.hidden_tag() }}
+                <fieldset class="p-3 border rounded mb-4">
+                    <legend class="w-auto px-2 fs-5">Información Requerida</legend>
+                    <div class="row g-4">
+                        {% for field in form if field.widget.input_type != 'hidden' and field.widget.input_type !=
+                        'submit' %}
+                        <div class="col-md-6">
+                            {% set field_class = 'form-select' if field.type == 'SelectField' else 'form-control' %}
+                            {{ render_field(field, class=field_class) }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+                <div class="text-center mt-4">
+                    {{ form.submit(class="btn btn-primary") }}
+                    <a href="{{ url_for('Institutions.list_institutions', role=role) }}"
+                        class="btn btn-secondary ms-2">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

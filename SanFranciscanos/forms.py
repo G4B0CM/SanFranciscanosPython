@@ -28,6 +28,26 @@ class RolSelectorForm(FlaskForm):
     ], validators=[DataRequired()])
     submit = SubmitField('Continuar')
 
+class CatequizadoForm(FlaskForm):
+    # Campos de Person
+    firstName = StringField('Primer Nombre', validators=[DataRequired(), Length(max=30)])
+    secondName = StringField('Segundo Nombre', validators=[Optional(), Length(max=30)])
+    lastName = StringField('Primer Apellido', validators=[DataRequired(), Length(max=30)])
+    secondLastName = StringField('Segundo Apellido', validators=[Optional(), Length(max=30)])
+    sex = SelectField('Sexo', choices=[('M', 'Masculino'), ('F', 'Femenino')], validators=[DataRequired()])
+    
+    # Campos de Catequizado
+    birthdate = DateField('Fecha de Nacimiento', validators=[DataRequired()], format='%Y-%m-%d')
+    bloodType = StringField('Tipo de Sangre', validators=[DataRequired(), Length(max=5)])
+    emergencyContactName = StringField('Contacto de Emergencia (Nombre)', validators=[DataRequired(), Length(max=50)])
+    emergencyContactPhone = StringField('Contacto de Emergencia (Teléfono)', validators=[DataRequired(), Length(max=15)])
+    state = BooleanField('Estado Activo', default=True)
+    alergies = TextAreaField('Alergias', validators=[Optional()])
+    details = TextAreaField('Detalles Adicionales', validators=[Optional()])
+    idInstitution = SelectField('Parroquia de Inscripción', coerce=int, validators=[Optional()])
+    
+    submit = SubmitField('Guardar')
+
 class CatequistaForm(FlaskForm):
     """Formulario para Catequista, coincide con sp_InsertCatequista."""
     firstName = StringField('Primer Nombre', validators=[DataRequired(), Length(max=30)])
@@ -84,35 +104,41 @@ class PadreMadreForm(FlaskForm):
     emailContact = StringField('Correo Electrónico', validators=[DataRequired(), Email(), Length(max=50)])
     submit = SubmitField('Guardar Padre/Madre')
 
-# --- Formularios para Entidades de Instituciones (Schema: Institutions) ---
+# --- Formularios para Instituciones (Schemas: Institutions) ---
+
+class InstitutionRolSelectorForm(FlaskForm):
+    """Formulario para seleccionar el tipo de institución a gestionar."""
+    role = SelectField('Tipo de Institución', choices=[
+        ('Arquidiocesis', 'Arquidiócesis'),
+        ('Vicaria', 'Vicaria'),
+        ('Parroquia', 'Parroquia')
+    ], validators=[DataRequired()])
+    submit = SubmitField('Seleccionar')
 
 class ArquidiocesisForm(FlaskForm):
-    """Formulario para Arquidiocesis, coincide con sp_InsertArquidiocesis."""
     name = StringField('Nombre', validators=[DataRequired(), Length(max=30)])
-    mainAddress = StringField('Dirección', validators=[DataRequired(), Length(max=50)])
-    type = StringField('Tipo', default='Arquidiocesis', render_kw={'readonly': True})
+    mainAddress = StringField('Dirección Principal', validators=[DataRequired(), Length(max=50)])
     city = StringField('Ciudad', validators=[DataRequired(), Length(max=30)])
-    idEclesiastico = SelectField('Eclesiástico a Cargo', coerce=int, validators=[DataRequired()])
+    # ---#-!-# CORREGIDO ---
+    idEclesiastico = SelectField('Eclesiástico Responsable', coerce=coerce_int_or_none, validators=[DataRequired(message="Debe seleccionar un responsable.")])
     submit = SubmitField('Guardar Arquidiócesis')
 
 class VicariaForm(FlaskForm):
-    """Formulario para Vicaria, coincide con sp_InsertVicaria."""
     name = StringField('Nombre', validators=[DataRequired(), Length(max=30)])
-    mainAddress = StringField('Dirección', validators=[DataRequired(), Length(max=50)])
-    type = StringField('Tipo', default='Vicaria', render_kw={'readonly': True})
+    mainAddress = StringField('Dirección Principal', validators=[DataRequired(), Length(max=50)])
     department = StringField('Departamento/Zona Pastoral', validators=[DataRequired(), Length(max=50)])
-    idArquidiocesis = SelectField('Arquidiócesis a la que Pertenece', coerce=int, validators=[DataRequired()])
-    idEclesiastico = SelectField('Vicario a Cargo', coerce=int, validators=[DataRequired()])
+    # ---#-!-# CORREGIDO ---
+    idArquidiocesis = SelectField('Pertenece a la Arquidiócesis', coerce=coerce_int_or_none, validators=[DataRequired(message="Debe seleccionar una arquidiócesis.")])
+    idEclesiastico = SelectField('Eclesiástico Responsable (Vicario)', coerce=coerce_int_or_none, validators=[DataRequired(message="Debe seleccionar un responsable.")])
     submit = SubmitField('Guardar Vicaria')
 
 class ParroquiaForm(FlaskForm):
-    """Formulario para Parroquia, coincide con sp_InsertParroquia."""
     name = StringField('Nombre', validators=[DataRequired(), Length(max=30)])
-    mainAddress = StringField('Dirección', validators=[DataRequired(), Length(max=50)])
-    type = StringField('Tipo', default='Parroquia', render_kw={'readonly': True})
+    mainAddress = StringField('Dirección Principal', validators=[DataRequired(), Length(max=50)])
     phone = StringField('Teléfono', validators=[Optional(), Length(max=15)])
-    idVicaria = SelectField('Vicaria a la que Pertenece', coerce=int, validators=[DataRequired()])
-    idEclesiastico = SelectField('Párroco a Cargo', coerce=int, validators=[DataRequired()])
+    # ---#-!-# CORREGIDO ---
+    idVicaria = SelectField('Pertenece a la Vicaria', coerce=coerce_int_or_none, validators=[DataRequired(message="Debe seleccionar una vicaria.")])
+    idEclesiastico = SelectField('Eclesiástico Responsable (Párroco)', coerce=coerce_int_or_none, validators=[DataRequired(message="Debe seleccionar un responsable.")])
     submit = SubmitField('Guardar Parroquia')
 
 # --- Formularios para Niveles y Cursos (Schema: Nivel) ---

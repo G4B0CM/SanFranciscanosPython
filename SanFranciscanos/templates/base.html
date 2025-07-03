@@ -149,6 +149,9 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdownPersons">
                             <li><a class="dropdown-item"
+                                    href="{{ url_for('Persons.list_persons', role='Catequizado') }}">Catequizados</a>
+                            </li>
+                            <li><a class="dropdown-item"
                                     href="{{ url_for('Persons.list_persons', role='Catequista') }}">Catequistas</a></li>
                             <li><a class="dropdown-item"
                                     href="{{ url_for('Persons.list_persons', role='Ayudante') }}">Ayudantes</a></li>
@@ -178,13 +181,13 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dropdownInstitutions">
                             <li><a class="dropdown-item"
-                                    href="{{ url_for('Institutions.list_institution', institution_type='Arquidiocesis') }}">Arquidiócesis</a>
+                                    href="{{ url_for('Institutions.list_institutions', role='Arquidiocesis') }}">Arquidiócesis</a>
                             </li>
                             <li><a class="dropdown-item"
-                                    href="{{ url_for('Institutions.list_institution', institution_type='Vicaria') }}">Vicarías</a>
+                                    href="{{ url_for('Institutions.list_institutions', role='Vicaria') }}">Vicarías</a>
                             </li>
                             <li><a class="dropdown-item"
-                                    href="{{ url_for('Institutions.list_institution', institution_type='Parroquia') }}">Parroquias</a>
+                                    href="{{ url_for('Institutions.list_institutions', role='Parroquia') }}">Parroquias</a>
                             </li>
                         </ul>
                     </li>
