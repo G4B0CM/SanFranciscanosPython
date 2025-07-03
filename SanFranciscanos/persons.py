@@ -42,19 +42,20 @@ def get_role_details(role):
                 'Estado': 'Estado'
             },
             'field_mapping': {
-                'firstName': 'Primer Nombre',
-                'secondName': 'Segundo Nombre',
-                'lastName': 'Primer Apellido',
-                'secondLastName': 'Segundo Apellido',
-                'birthDate': 'Fecha de Nacimiento',
-                'sex': 'Sexo',
-                'bloodType': 'Tipo de sangre',
-                'allergies': 'Alergias',
-                'emergencyContactName': 'Nombre Contacto de Emergencia',
-                'emergencyContactPhone': 'Número de Contacto de Emergencia',
-                'details': 'Detalles',
-                'state': 'Estado'
-            }
+    'firstName': 'Primer Nombre',
+    'secondName': 'Segundo Nombre',
+    'lastName': 'Primer Apellido',
+    'secondLastName': 'Segundo Apellido',
+    'birthdate': 'Fecha de Nacimiento', # <-- CORREGIDO
+    'sex': 'Sexo',
+    'bloodType': 'Tipo de sangre',
+    'alergies': 'Alergias', # <-- CORREGIDO
+    'emergencyContactName': 'Nombre Contacto de Emergencia',
+    'emergencyContactPhone': 'Número de Contacto de Emergencia',
+    'details': 'Detalles',
+    'state': 'Estado',
+    'idInstitution': 'idInstitution' # <-- Añadido para que la edición precargue la parroquia
+}
         },
         'Catequista': {
             'form': CatequistaForm,
@@ -213,12 +214,15 @@ def load_dynamic_choices(form, role, session):
         form.idCatequizado.choices.insert(0, ('', '-- Seleccione un Catequizado --'))
     
     #-!-# LÓGICA AGREGADA PARA CARGAR INSTITUCIONES
-    if role == 'Eclesiastico':
-        query = text("SELECT idInstitution, name FROM Institutions.Institution ORDER BY name")
-        institutions = session.execute(query).all()
-        form.idInstitution.choices = [
-            (i.idInstitution, i.name) for i in institutions
-        ]
+    if role in ['Eclesiastico', 'Catequizado']:
+        # Usamos la vista de Parroquias para asegurarnos de que solo cargamos ese tipo de institución.
+        query_inst = text("SELECT [ID Institución], [Nombre Parroquia] FROM Institutions.v_InfoParroquia ORDER BY [Nombre Parroquia]")
+        institutions = session.execute(query_inst).mappings().all()
+        
+        # El campo se llama 'idInstitution' en ambos formularios (EclesiasticoForm y CatequizadoForm)
+        form.idInstitution.choices = [(i['ID Institución'], i['Nombre Parroquia']) for i in institutions]
+        
+        # Añadimos una opción por defecto para que sea opcional
         form.idInstitution.choices.insert(0, ('', '-- Sin Institución Asignada --'))
 
 # --- Rutas ---

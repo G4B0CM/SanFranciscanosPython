@@ -200,12 +200,28 @@ def delete_item(role, item_id):
         sql = text(f"EXEC Nivel.{role_details['sp_delete']} @{role_details['id_param']} = :id")
         session.execute(sql, {"id": item_id})
         session.commit()
-        flash(f'{role} con ID {item_id} ha sido eliminado.', 'success')
+        # Este mensaje solo se mostrará si el COMMIT fue exitoso
+        flash(f'{role} con ID {item_id} y todas sus dependencias han sido eliminados.', 'success')
+
     except exc.SQLAlchemyError as e:
-        session.rollback()
-        flash(f"Error al eliminar {role}: {getattr(e, 'orig', e)}", 'danger')
+        # Este bloque ahora se ejecutará gracias al THROW del SP
+        if session.is_active:
+            session.rollback()
+        
+        # Limpiamos el mensaje de error para que sea legible
+        raw_error_msg = str(getattr(e, 'orig', e))
+        try:
+            # Buscamos el mensaje del error de SQL Server
+            clean_msg = raw_error_msg.split('[SQL Server]')[1].split('(S)')[0].strip()
+        except:
+            clean_msg = raw_error_msg # Fallback por si el formato es inesperado
+            
+        flash(f"Error al eliminar {role}: {clean_msg}", 'danger')
+        print(f"!!! ERROR AL BORRAR: {clean_msg} !!!") # Para depuración
     finally:
-        session.close()
+        if session.is_active:
+            session.close()
+
     return redirect(url_for('Levels.list_items', role=role))
 
 @bp.route('/<role>/<int:item_id>')

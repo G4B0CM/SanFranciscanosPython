@@ -49,7 +49,8 @@ def get_item_details(role):
                 'Primer Nombre Parent': 'Nombre del Padre', 'Ocupación Parent': 'Ocupación del Padre', 'Teléfono Parent': 'Contacto del Padre',
                 'Primer Nombre Madre': 'Nombre de la Madre', 'Ocupación Madre': 'Ocupación de la Madre', 'Teléfono Madre': 'Contacto de la Madre',
                 'Contacto de emergencia': 'Contacto de Emergencia', 'Teléfono de contacto de emergencia': 'Teléfono de Emergencia'
-            }
+            },
+            'display_name': 'Fichas de Inscripción'
         },
         'Payment': {
             'form': PaymentForm, 'sp_insert': 'sp_InsertPayment', 'sp_update': 'sp_UpdatePayment',
@@ -63,6 +64,7 @@ def get_item_details(role):
             # --- Y CAMBIO AQUÍ ---
             # (La etiqueta para el usuario sí puede llevar acento)
             'detail_fields': {'ID': 'ID de Pago', 'Nombre Catequizado': 'Pagado por', 'Apellido Catequizado': '', 'Monto': 'Monto', 'Fecha Pago': 'Fecha', 'Metodo': 'Método de Pago', 'Estado': 'Estado del Pago'}
+            ,'display_name': 'Pagos'
         },
         'Attendance': {
             'form': AttendanceForm, 'sp_insert': 'sp_InsertAttendance', 'sp_update': 'sp_UpdateAttendance',
@@ -70,37 +72,45 @@ def get_item_details(role):
             'list_headers': ['Catequizado', 'Nivel', 'Fecha Registro', 'Estado Asistencia'],
             'id_param': ['idCurso', 'idCatequizado', 'dateOfAttendance'],
             'field_map': {'idCurso': 'idCurso', 'idCatequizado': 'idCatequizado', 'dateOfAttendance': 'dateOfAttendance', 'Estado Asistencia': 'state'},
-            'detail_fields': {'Catequizado': 'Catequizado', 'Nivel': 'Nivel', 'Fecha Registro': 'Fecha', 'Estado Asistencia': 'Asistencia'}
+            'detail_fields': {'Catequizado': 'Catequizado', 'Nivel': 'Nivel', 'Fecha Registro': 'Fecha', 'Estado Asistencia': 'Asistencia'},
+            'display_name': 'Asistencias'
         },
         'Acreditation': {
             'form': AcreditationForm, 'sp_insert': 'sp_InsertAcreditation', 'sp_update': 'sp_UpdateAcreditation',
             'sp_delete': 'sp_DeleteAcreditation', 'view': 'v_InfoAcreditation',
             'list_headers': ['ID', 'Catequizado', 'Institución'], 'output_param': 'CreatedAcreditationID', 'id_param': 'idAcreditation',
             'field_map': {'ID': 'idAcreditation', 'idInstitution': 'idInstitution', 'idCatequizado': 'idCatequizado', 'Contenido Acreditación': 'messageText'},
-            'detail_fields': {'ID': 'ID Acreditación', 'Catequizado': 'Acreditado', 'Institución': 'Emitida por', 'Contenido Acreditación': 'Mensaje'}
+            'detail_fields': {'ID': 'ID Acreditación', 'Catequizado': 'Acreditado', 'Institución': 'Emitida por', 'Contenido Acreditación': 'Mensaje'},
+            'display_name': 'Acreditaciones'
         },
         'BautismFaith': {
             'form': BautismFaithForm, 'sp_insert': 'sp_InsertBautismFaith', 'sp_update': 'sp_UpdateBautismFaith',
             'sp_delete': 'sp_DeleteBautismFaith', 'view': 'v_InfoBauthismFaith',
             'list_headers': ['ID', 'Parroquia', 'Fecha Bautismo'], 'output_param': 'CreatedBautismFaithID', 'id_param': 'idBautismFaith',
             'field_map': {'ID': 'idBautismFaith', 'idCatequizado': 'idCatequizado', 'idParroquia': 'idParroquia', 'Fecha Bautismo': 'bautismDate', 'Registro Parroquial': 'numbrParroquialRegistration', 'idPadre': 'idPadre', 'idMadre': 'idMadre', 'idPadrino': 'idPadrino', 'Nota Marginal': 'marginalNote'},
-            'detail_fields': {'ID': 'ID Fe de Bautismo', 'ID Catequizado': 'Catequizado (ID)', 'Parroquia': 'Parroquia', 'Fecha Bautismo': 'Fecha', 'Registro Parroquial': 'Nº Registro', 'Sacerdote': 'Sacerdote'}
+            'detail_fields': {'ID': 'ID Fe de Bautismo', 'ID Catequizado': 'Catequizado (ID)', 'Parroquia': 'Parroquia', 'Fecha Bautismo': 'Fecha', 'Registro Parroquial': 'Nº Registro', 'Sacerdote': 'Sacerdote'},
+            'display_name': 'Fes de Bautismo'
         },
             'LevelAprobation': {
             'form': LevelAprobationForm, 'sp_insert': 'sp_InsertLevelAprobation', 'sp_update': 'sp_UpdateLevelAprobation',
             'sp_delete': 'sp_DeleteLevelAprobation', 'view': 'v_InfoLevelAprobation',
             'list_headers': ['ID', 'Catequizado', 'Nivel', 'Resultado'], 'output_param': 'CreatedLevelAprobationID', 'id_param': 'idLevelAprobation',
             'field_map': {'ID': 'idLevelAprobation', 'idCurso': 'idCurso', 'idCatequizado': 'idCatequizado', 'idCatequista': 'idCatequista', 'Resultado': 'resultOfLevel', 'Comentarios': 'commentaries'},
-            'detail_fields': {'ID': 'idLevelAprobation', 'idCurso': 'idCurso', 'idCatequizado': 'idCatequizado', 'idCatequista': 'idCatequista', 'Resultado': 'Resultado', 'Comentarios': 'Comentarios'}
+            'detail_fields': {'ID': 'idLevelAprobation', 'idCurso': 'idCurso', 'idCatequizado': 'idCatequizado', 'idCatequista': 'idCatequista', 'Resultado': 'Resultado', 'Comentarios': 'Comentarios'},
+            'display_name': 'Aprobaciones de Nivel'
             },
             'LevelCertificate': {
             'form': LevelCertificateForm, 'sp_insert': 'sp_InsertLevelCertificate', 'sp_update': 'sp_UpdateLevelCertificate',
             'sp_delete': 'sp_DeleteLevelCertificate', 'view': 'v_InfoLevelCertificate',
             'list_headers': ['ID', 'Nivel', 'Fecha Entrega'], 'output_param': 'CreatedLevelCertificateID', 'id_param': 'idLevelCertificate',
             'field_map': {'ID': 'idLevelCertificate', 'idCurso': 'idCurso', 'idCatequizado': 'idCatequizado', 'idCatequista': 'idCatequista', 'idEclesiastico': 'idEclesiastico', 'Fecha Entrega': 'deliveryDate', 'Frase de Catequesis': 'catequesisPrhase', 'URL del Logo de la Parroquia': 'parroquiaLogo', 'Observaciones': 'commentaries'},
-            'detail_fields': {'ID': 'ID', 'idCurso': 'Curso (Id)', 'idCatequizado': 'Catequizado', 'idCatequista': 'Catequista', 'idEclesiastico': 'Eclesiastico', 'Fecha Entrega': 'Fecha de Entrega', 'Frase de Catequesis': 'Frase de Catequesis', 'URL del Logo de la Parroquia': 'Parroquia Logo', 'Observaciones': 'Observaciones'}
+            'detail_fields': {'ID': 'ID', 'idCurso': 'Curso (Id)', 'idCatequizado': 'Catequizado', 'idCatequista': 'Catequista', 'idEclesiastico': 'Eclesiastico', 'Fecha Entrega': 'Fecha de Entrega', 'Frase de Catequesis': 'Frase de Catequesis', 'URL del Logo de la Parroquia': 'Parroquia Logo', 'Observaciones': 'Observaciones'},
+            'display_name': 'Certificados de Nivel'
             }
     }
+    for key, value in roles.items():
+        if 'display_name' not in value:
+            value['display_name'] = key
     return roles.get(role)
 
 def load_document_dynamic_choices(form, role, session):
@@ -197,9 +207,16 @@ def list_items(role):
     finally:
         session.close()
         
-    return render_template('Documents/list.html', items=results,
-                            headers=role_details['list_headers'], role=role, 
-                            delete_form=DeleteForm(), title=f"Lista de {role}s")
+    return render_template('Documents/list.html', 
+                           items=results,
+                           headers=role_details['list_headers'], 
+                           role=role, 
+                           delete_form=DeleteForm(), 
+                           title=f"Lista de {role_details['display_name']}",
+                           # ---#-!-# LÍNEA AÑADIDA ---
+                           # Pasamos el nombre amigable a la plantilla
+                           display_name=role_details['display_name'] 
+                          )
 
 @bp.route('/new/<role>', methods=['GET', 'POST'])
 def new_item(role):
@@ -249,7 +266,7 @@ def new_item(role):
             'Información de la Ficha': [f for f in form if f.name.startswith('ds_')]
         }
 
-    return render_template('Documents/form.html', form=form, title=f'Nuevo {role}', role=role, action_url=url_for('Documents.new_item', role=role), field_groups=field_groups)
+    return render_template('Documents/form.html', form=form, title=f'Nuevo Registro de {role_details['display_name']}', role=role, action_url=url_for('Documents.new_item', role=role), field_groups=field_groups)
 
 
 @bp.route('/edit/<role>/<int:item_id>', methods=['GET', 'POST'])
@@ -313,7 +330,7 @@ def edit_item(role, item_id):
             flash(f"{role} actualizado exitosamente.", 'success')
             return redirect(url_for('Documents.list_items', role=role))
 
-        return render_template('Documents/form.html', form=form, title=f'Editar {role}', role=role, action_url=url_for('Documents.edit_item', role=role, item_id=item_id))
+        return render_template('Documents/form.html', form=form, title=f'Editar {role_details['display_name']}', role=role, action_url=url_for('Documents.edit_item', role=role, item_id=item_id))
     finally:
         session.close()
 
@@ -446,7 +463,7 @@ def detail_item(role, item_id):
         return redirect(url_for('Documents.list_items', role=role))
 
     return render_template('Documents/detail.html', detail_items=detail_items, 
-                           title=f"Detalle de {role}", role=role)
+                           title=f"Detalle de {role_details['display_name']}", role=role)
 
 @bp.route('/edit/DataSheet/<int:item_id>', methods=['GET', 'POST'])
 def edit_datasheet(item_id):
