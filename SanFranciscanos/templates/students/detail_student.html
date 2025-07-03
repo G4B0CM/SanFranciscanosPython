@@ -5,16 +5,27 @@
 <h2>Detalle del Catequizado</h2>
 
 <ul class="list-group mb-4">
-    <li class="list-group-item"><strong>Nombres:</strong> {{ student.firstName }} {{ student.secondName }}</li>
-    <li class="list-group-item"><strong>Apellidos:</strong> {{ student.lastName }} {{ student.secondLastName }}</li>
-    <li class="list-group-item"><strong>Sexo:</strong> {{ student.sex }}</li>
-    <li class="list-group-item"><strong>Fecha de nacimiento:</strong> {{ student.birthdate }}</li>
-    <li class="list-group-item"><strong>Tipo de sangre:</strong> {{ student.bloodType }}</li>
-    <li class="list-group-item"><strong>Alergias:</strong> {{ student.alergies }}</li>
-    <li class="list-group-item"><strong>Contacto de emergencia:</strong> {{ student.emergencyContactName }} - {{ student.emergencyContactPhone }}</li>
-    <li class="list-group-item"><strong>Detalles médicos:</strong> {{ student.details }}</li>
+    <li class="list-group-item"><strong>Nombres:</strong> {{ student.c_firstName }} {{ student.c_secondName }}</li>
+    <li class="list-group-item"><strong>Apellidos:</strong> {{ student.c_lastName }} {{ student.c_secondLastName }}</li>
+    <li class="list-group-item"><strong>Sexo:</strong> {{ student.c_sex }}</li>
+    <li class="list-group-item"><strong>Fecha de nacimiento:</strong> {{ student.c_birthdate }}</li>
+    <li class="list-group-item"><strong>Tipo de sangre:</strong> {{ student.c_bloodType }}</li>
+    <li class="list-group-item"><strong>Alergias:</strong> {{ student.c_alergies }}</li>
+    <li class="list-group-item"><strong>Contacto de emergencia:</strong> {{ student.c_emergencyContactName }} - {{ student.c_emergencyContactPhone }}</li>
+    <li class="list-group-item"><strong>Detalles médicos:</strong> {{ student.c_details }}</li>
+
+    <hr>
+    <li class="list-group-item"><strong>Número de hijos:</strong> {{ student.ds_sonNumbr }}</li>
+    <li class="list-group-item"><strong>Número de hermanos:</strong> {{ student.ds_numbrBrothers }}</li>
+    <li class="list-group-item"><strong>Vive con:</strong> {{ student.ds_livesWith }}</li>
+    <li class="list-group-item"><strong>Teléfono residencial:</strong> {{ student.ds_residentialPhone }}</li>
+    <li class="list-group-item"><strong>Dirección principal:</strong> {{ student.ds_mainAddress }}</li>
+    <li class="list-group-item"><strong>Unidad educativa:</strong> {{ student.ds_schoolsName }}</li>
+    <li class="list-group-item"><strong>Grado escolar:</strong> {{ student.ds_schoolGrade }}</li>
+    <li class="list-group-item"><strong>Nivel catequético:</strong> {{ student.ds_idLevel }}</li>
+    <li class="list-group-item"><strong>Institución:</strong> {{ student.ds_idInstitution }}</li>
 </ul>
 
-<a href="{{ url_for('Students.index') }}" class="btn btn-secondary">Volver</a>
-<a href="{{ url_for('Students.edit', id=student._id) }}" class="btn btn-warning">Editar</a>
+<a href="{{ url_for('students.list_students') }}" class="btn btn-secondary">Volver</a>
+<a href="{{ url_for('students.edit_student', id=student._id) }}" class="btn btn-warning">Editar</a>
 {% endblock %}

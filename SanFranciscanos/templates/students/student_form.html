@@ -92,14 +92,9 @@
             {{ form.ds_idInstitution.label(class="form-label") }}
             {{ form.ds_idInstitution(class="form-control") }}
         </div>
-        <div class="col-md-6 mb-3">
-            {{ form.ds_idCertificate.label(class="form-label") }}
-            {{ form.ds_idCertificate(class="form-control") }}
-        </div>
-
     </div>
 
     <button type="submit" class="btn btn-primary">Guardar</button>
-    <a href="{{ url_for('Students.index') }}" class="btn btn-secondary">Cancelar</a>
+    <a href="{{ url_for('students.list_students') }}" class="btn btn-secondary">Cancelar</a>
 </form>
 {% endblock %}

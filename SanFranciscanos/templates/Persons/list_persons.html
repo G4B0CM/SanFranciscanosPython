@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">{{ title }}</h2>
+
+<a href="{{ url_for('persons.new') }}" class="btn btn-success mb-3">Nueva Persona</a>
+
+{% if persons %}
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Documento</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for person in persons %}
+        <tr>
+            <td>{{ person.name }}</td>
+            <td>{{ person.surname }}</td>
+            <td>{{ person.document }}</td>
+            <td>{{ person.role }}</td>
+            <td>
+                <a href="{{ url_for('persons.detail', id=person._id) }}" class="btn btn-info btn-sm">Detalle</a>
+                <a href="{{ url_for('persons.edit', id=person._id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <form method="post" action="{{ url_for('persons.delete', id=person._id) }}" style="display:inline;">
+                    {{ delete_form.hidden_tag() }}
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta persona?');">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="alert alert-info">No hay personas registradas.</div>
+{% endif %}
+{% endblock %}

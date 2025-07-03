@@ -2,19 +2,12 @@ import os
 import json
 import locale
 from flask import Flask
-from flask_pymongo import PyMongo
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from . import models as md
-
-mongo = PyMongo()
+from .db import init_db
 
 def create_app():
     app = Flask(__name__)
 
-    # ───────────────────────────────
-    # CONFIGURACIÓN DE LOCALIZACIÓN
-    # ───────────────────────────────
+    # Intentar establecer el locale en español
     try:
         locale.setlocale(locale.LC_ALL, 'es_ES.UTF-8')
     except locale.Error:
@@ -23,57 +16,27 @@ def create_app():
         except locale.Error:
             print("No se pudo establecer configuración regional a Español.")
 
-    # ───────────────────────────────
-    # CARGA DE CONFIGURACIÓN
-    # ───────────────────────────────
-    ruta_config = os.path.join(os.path.dirname(__file__), '..', 'config.json')
+    # Cargar configuración desde config.json
+    ruta_config = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config.json'))
     with open(ruta_config, 'r') as archivo_config:
         config = json.load(archivo_config)
 
-    # Clave secreta Flask
+    # Validar existencia de claves necesarias
+    if 'mongo_uri' not in config or 'mongo_db' not in config:
+        raise KeyError("Las claves 'mongo_uri' y/o 'mongo_db' faltan en config.json")
+
+    # Configuración para Flask
     app.config['SECRET_KEY'] = config['secret_key']
+    app.config['mongo_uri'] = config['mongo_uri']
+    app.config['mongo_db'] = config['mongo_db']
 
-    # ───────────────────────────────
-    # CONFIGURACIÓN DE SQL SERVER
-    # ───────────────────────────────
-    NAME_SERVER = config['name_server']
-    DATABASE    = config['database']
-    USERNAME    = config.get('username')
-    PASSWORD    = config.get('password')
-    DRIVER      = config['controlador_odbc']
+    # Debug opcional
+    print(f"[CONFIG] Base MongoDB: {app.config['mongo_db']}")
 
-    if USERNAME and PASSWORD:
-        conn_str = (
-            f"mssql+pyodbc://{USERNAME}:{PASSWORD}@{NAME_SERVER}/{DATABASE}?"
-            f"driver={DRIVER}&TrustServerCertificate=yes"
-        )
-    else:
-        conn_str = (
-            f"mssql+pyodbc://@{NAME_SERVER}/{DATABASE}?"
-            f"driver={DRIVER}&Trusted_Connection=yes&TrustServerCertificate=yes"
-        )
+    # Inicializar base de datos (Mongo)
+    init_db(app)
 
-    engine = create_engine(conn_str, echo=False, future=True)
-    app.engine = engine
-    app.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-    try:
-        with engine.connect():
-            print("Conectado a SQL Server")
-    except Exception as e:
-        print(f"Error al conectar a SQL Server: {e}")
-
-    # ───────────────────────────────
-    # CONFIGURACIÓN DE MONGODB
-    # ───────────────────────────────
-    app.config["MONGO_URI"] = f"{config['mongo_uri']}/{config['mongo_db']}"
-    mongo.init_app(app)
-    app.mongo_db = mongo.db  # Esto te da acceso directo vía current_app.mongo_db
-    print(f"✅ Conectado a MongoDB en {app.config['MONGO_URI']}")
-
-    # ───────────────────────────────
-    # IMPORTAR Y REGISTRAR RUTAS
-    # ───────────────────────────────
+    # Registrar Blueprints
     from .routes.auth         import bp as auth_bp
     from .routes.home         import bp as home_bp
     from .routes.documents    import bp as documents_bp

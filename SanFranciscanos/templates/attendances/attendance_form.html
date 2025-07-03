@@ -6,24 +6,39 @@
         {{ form.hidden_tag() }}
 
         <div class="mb-3">
-            {{ form.idCurso.label(class="form-label") }}
-            {{ form.idCurso(class="form-control") }}
+            <label for="course_id" class="form-label">ID Curso</label>
+            {{ form.course_id(class="form-control", id="course_id", value=form.course_id.data) }}
+            {% if form.course_id.errors %}
+                <div class="text-danger small">{{ form.course_id.errors[0] }}</div>
+            {% endif %}
         </div>
+
         <div class="mb-3">
-            {{ form.idCatequizado.label(class="form-label") }}
-            {{ form.idCatequizado(class="form-control") }}
+            <label for="student_id" class="form-label">ID Catequizado</label>
+            {{ form.student_id(class="form-control", id="student_id", value=form.student_id.data) }}
+            {% if form.student_id.errors %}
+                <div class="text-danger small">{{ form.student_id.errors[0] }}</div>
+            {% endif %}
         </div>
+
         <div class="mb-3">
-            {{ form.date.label(class="form-label") }}
-            {{ form.date(class="form-control") }}
+            <label for="date" class="form-label">Fecha</label>
+            {{ form.date(class="form-control", id="date") }}
+            {% if form.date.errors %}
+                <div class="text-danger small">{{ form.date.errors[0] }}</div>
+            {% endif %}
         </div>
-        <div class="form-check mb-3">
-            {{ form.present(class="form-check-input") }}
-            {{ form.present.label(class="form-check-label") }}
+
+        <div class="mb-3">
+            <label for="status" class="form-label">¿Asistió?</label>
+            {{ form.status(class="form-select", id="status") }}
+            {% if form.status.errors %}
+                <div class="text-danger small">{{ form.status.errors[0] }}</div>
+            {% endif %}
         </div>
 
         <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
-        <a href="{{ url_for('Attendances.index') }}" class="btn btn-secondary">Cancelar</a>
+        <a href="{{ url_for('attendances_bp.list_attendances') }}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}

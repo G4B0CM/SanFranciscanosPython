@@ -14,6 +14,6 @@
     <li class="list-group-item"><strong>Última actualización:</strong> {{ document.updatedAt }}</li>
 </ul>
 
-<a href="{{ url_for('Documents.edit', id=document._id) }}" class="btn btn-warning">Editar</a>
-<a href="{{ url_for('Documents.index') }}" class="btn btn-secondary">Volver</a>
+<a href="{{ url_for('documents.edit', id=document._id) }}" class="btn btn-warning">Editar</a>
+<a href="{{ url_for('documents.index') }}" class="btn btn-secondary">Volver</a>
 {% endblock %}

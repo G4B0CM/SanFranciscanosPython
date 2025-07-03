@@ -4,7 +4,7 @@
 {% block content %}
 <h2 class="mb-4">Catequizados</h2>
 
-<a href="{{ url_for('Students.new') }}" class="btn btn-success mb-3">Nuevo Catequizado</a>
+<a href="{{ url_for('students.create_student') }}" class="btn btn-success mb-3">Nuevo Catequizado</a>
 
 <table class="table table-striped">
     <thead>
@@ -19,14 +19,14 @@
     <tbody>
         {% for student in students %}
         <tr>
-            <td>{{ student.firstName }} {{ student.secondName }}</td>
-            <td>{{ student.lastName }} {{ student.secondLastName }}</td>
-            <td>{{ student.sex }}</td>
-            <td>{{ student.birthdate }}</td>
+            <td>{{ student.c_firstName }} {{ student.c_secondName }}</td>
+            <td>{{ student.c_lastName }} {{ student.c_secondLastName }}</td>
+            <td>{{ student.c_sex }}</td>
+            <td>{{ student.c_birthdate.strftime('%d/%m/%Y') if student.c_birthdate }}</td>
             <td>
-                <a href="{{ url_for('Students.detail', id=student._id) }}" class="btn btn-sm btn-primary">Ver</a>
-                <a href="{{ url_for('Students.edit', id=student._id) }}" class="btn btn-sm btn-warning">Editar</a>
-                <form method="post" action="{{ url_for('Students.delete', id=student._id) }}" style="display:inline;">
+                {# <a href="{{ url_for('students.view_student', id=student._id) }}" class="btn btn-sm btn-primary">Ver</a> #}
+                <a href="{{ url_for('students.edit_student', id=student._id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form method="post" action="{{ url_for('students.delete_student', id=student._id) }}" style="display:inline;">
                     {{ delete_form.hidden_tag() }}
                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Deseas eliminar este catequizado?')">Eliminar</button>
                 </form>

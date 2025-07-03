@@ -1,21 +1,31 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from bson import ObjectId
-from SanFranciscanos.forms import GruposForm, DeleteForm
+from bson.errors import InvalidId
 from datetime import datetime
+from SanFranciscanos.forms import GruposForm, DeleteForm
+from SanFranciscanos.db import get_mongo_db
 
-bp = Blueprint('Groups', __name__, url_prefix='/groups')
+bp = Blueprint('groups', __name__, url_prefix='/groups')
+
 
 @bp.route('/')
 def index():
-    grupos = current_app.mongo_db.groups.find()
-    cursos = {str(curso['_id']): curso['name'] for curso in current_app.mongo_db.courses.find()}
-    catequizados = {str(person['_id']): person['c_firstName'] + ' ' + person['c_lastName']
-                    for person in current_app.mongo_db.persons.find()}
-    return render_template('groups/list_groups.html', grupos=grupos, cursos=cursos, catequizados=catequizados, delete_form=DeleteForm())
+    db = get_mongo_db()
+    grupos = list(db.groups.find())
+    cursos = {str(curso['_id']): curso['name'] for curso in db.courses.find()}
+    catequizados = {str(person['_id']): person['c_firstName'] + ' ' + person['c_lastName'] for person in db.persons.find()}
+    delete_form = DeleteForm()
+    return render_template('groups/list_groups.html', grupos=grupos, cursos=cursos,
+                           catequizados=catequizados, delete_form=delete_form, title="Grupos")
+
 
 @bp.route('/new', methods=['GET', 'POST'])
 def new():
+    db = get_mongo_db()
     form = GruposForm()
+    form.idCatequizado.choices = [(str(p['_id']), f"{p['c_firstName']} {p['c_lastName']}") for p in db.persons.find()]
+    form.idCurso.choices = [(str(c['_id']), c['name']) for c in db.courses.find()]
+
     if form.validate_on_submit():
         nuevo_grupo = {
             'idCatequizado': ObjectId(form.idCatequizado.data),
@@ -24,35 +34,54 @@ def new():
             'createdAt': datetime.utcnow(),
             'updatedAt': datetime.utcnow()
         }
-        current_app.mongo_db.groups.insert_one(nuevo_grupo)
-        flash('Grupo inscrito correctamente.')
-        return redirect(url_for('Groups.index'))
-
-    # Cargar opciones para los selects
-    form.idCatequizado.choices = [(str(p['_id']), f"{p['c_firstName']} {p['c_lastName']}") for p in current_app.mongo_db.persons.find()]
-    form.idCurso.choices = [(str(c['_id']), c['name']) for c in current_app.mongo_db.courses.find()]
+        db.groups.insert_one(nuevo_grupo)
+        flash('Inscripción creada exitosamente.', 'success')
+        return redirect(url_for('groups.index'))
 
     return render_template('groups/group_form.html', form=form, title="Nuevo Grupo")
 
+
 @bp.route('/<id>')
 def detail(id):
-    grupo = current_app.mongo_db.groups.find_one({'_id': ObjectId(id)})
-    curso = current_app.mongo_db.courses.find_one({'_id': grupo['idCurso']})
-    catequizado = current_app.mongo_db.persons.find_one({'_id': grupo['idCatequizado']})
-    return render_template('groups/detail_group.html', grupo=grupo, curso=curso, catequizado=catequizado)
+    db = get_mongo_db()
+    try:
+        grupo = db.groups.find_one({'_id': ObjectId(id)})
+    except InvalidId:
+        flash("ID inválido.", "danger")
+        return redirect(url_for('groups.index'))
+
+    if not grupo:
+        flash("Grupo no encontrado.", "danger")
+        return redirect(url_for('groups.index'))
+
+    curso = db.courses.find_one({'_id': grupo['idCurso']})
+    catequizado = db.persons.find_one({'_id': grupo['idCatequizado']})
+
+    return render_template('groups/detail_group.html', grupo=grupo, curso=curso,
+                           catequizado=catequizado, title="Detalle de Grupo")
+
 
 @bp.route('/<id>/edit', methods=['GET', 'POST'])
 def edit(id):
-    grupo = current_app.mongo_db.groups.find_one({'_id': ObjectId(id)})
-    form = GruposForm(data={
-        'idCatequizado': str(grupo['idCatequizado']),
-        'idCurso': str(grupo['idCurso']),
-        'fechaInscripcion': grupo['fechaInscripcion'].strftime('%Y-%m-%d')
-    })
+    db = get_mongo_db()
+    try:
+        grupo = db.groups.find_one({'_id': ObjectId(id)})
+    except InvalidId:
+        flash("ID inválido.", "danger")
+        return redirect(url_for('groups.index'))
 
-    # Cargar opciones para los selects
-    form.idCatequizado.choices = [(str(p['_id']), f"{p['c_firstName']} {p['c_lastName']}") for p in current_app.mongo_db.persons.find()]
-    form.idCurso.choices = [(str(c['_id']), c['name']) for c in current_app.mongo_db.courses.find()]
+    if not grupo:
+        flash("Grupo no encontrado.", "danger")
+        return redirect(url_for('groups.index'))
+
+    form = GruposForm()
+    form.idCatequizado.choices = [(str(p['_id']), f"{p['c_firstName']} {p['c_lastName']}") for p in db.persons.find()]
+    form.idCurso.choices = [(str(c['_id']), c['name']) for c in db.courses.find()]
+
+    if request.method == 'GET':
+        form.idCatequizado.data = str(grupo['idCatequizado'])
+        form.idCurso.data = str(grupo['idCurso'])
+        form.fechaInscripcion.data = grupo['fechaInscripcion']
 
     if form.validate_on_submit():
         update_data = {
@@ -61,14 +90,20 @@ def edit(id):
             'fechaInscripcion': form.fechaInscripcion.data,
             'updatedAt': datetime.utcnow()
         }
-        current_app.mongo_db.groups.update_one({'_id': ObjectId(id)}, {'$set': update_data})
-        flash('Grupo actualizado correctamente.')
-        return redirect(url_for('Groups.index'))
+        db.groups.update_one({'_id': ObjectId(id)}, {'$set': update_data})
+        flash('Grupo actualizado exitosamente.', 'success')
+        return redirect(url_for('groups.index'))
 
     return render_template('groups/group_form.html', form=form, title="Editar Grupo")
 
+
 @bp.route('/<id>/delete', methods=['POST'])
 def delete(id):
-    current_app.mongo_db.groups.delete_one({'_id': ObjectId(id)})
-    flash('Inscripción eliminada correctamente.')
-    return redirect(url_for('Groups.index'))
+    db = get_mongo_db()
+    try:
+        db.groups.delete_one({'_id': ObjectId(id)})
+        flash('Inscripción eliminada correctamente.', 'success')
+    except InvalidId:
+        flash("ID inválido.", "danger")
+
+    return redirect(url_for('groups.index'))

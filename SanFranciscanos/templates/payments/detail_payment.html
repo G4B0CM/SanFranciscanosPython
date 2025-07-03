@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Detalle del Pago{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Detalle del Pago</h2>
+
+<ul class="list-group mb-3">
+    <li class="list-group-item"><strong>Estudiante:</strong> {{ student.firstName }} {{ student.lastName }}</li>
+    <li class="list-group-item"><strong>Monto:</strong> ${{ payment.amount }}</li>
+    <li class="list-group-item"><strong>Método:</strong> {{ payment.method }}</li>
+    <li class="list-group-item"><strong>Fecha:</strong> {{ payment.date }}</li>
+    <li class="list-group-item"><strong>Notas:</strong> {{ payment.notes }}</li>
+</ul>
+
+<a href="{{ url_for('payments.index') }}" class="btn btn-secondary">Volver a la lista</a>
+{% endblock %}

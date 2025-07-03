@@ -4,7 +4,10 @@
 {% block content %}
 <h2 class="mb-4">Lista de Certificados</h2>
 
-<a href="{{ url_for('Certificates.create_certificate') }}" class="btn btn-success mb-3">Nuevo Certificado</a>
+<div class="mb-3 d-flex justify-content-between">
+    <a href="{{ url_for('certificates.create_certificate') }}" class="btn btn-success">Nuevo Certificado</a>
+    <a href="{{ url_for('certificates.download_certificates') }}" class="btn btn-outline-primary">📄 Descargar Informe</a>
+</div>
 
 <table class="table table-striped">
     <thead>
@@ -18,13 +21,13 @@
     <tbody>
         {% for cert in certificates %}
         <tr>
-            <td>{{ cert.idCatequizado }}</td>
-            <td>{{ cert.idSacramento }}</td>
+            <td>{{ cert.nombreCatequizado }}</td>
+            <td>{{ cert.nombreSacramento }}</td>
             <td>{{ cert.fechaEmision }}</td>
             <td>
-                <a href="{{ url_for('Certificates.detail_certificate', id=cert._id) }}" class="btn btn-sm btn-primary">Ver</a>
-                <a href="{{ url_for('Certificates.edit_certificate', id=cert._id) }}" class="btn btn-sm btn-warning">Editar</a>
-                <form method="POST" action="{{ url_for('Certificates.delete_certificate', id=cert._id) }}" style="display:inline;">
+                <a href="{{ url_for('certificates.detail_certificate', id=cert._id) }}" class="btn btn-sm btn-primary">Ver</a>
+                <a href="{{ url_for('certificates.edit_certificate', id=cert._id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form method="POST" action="{{ url_for('certificates.delete_certificate', id=cert._id) }}" style="display:inline;">
                     {{ delete_form.hidden_tag() }}
                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Deseas eliminar este certificado?')">Eliminar</button>
                 </form>

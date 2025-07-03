@@ -1,69 +1,13 @@
-
 {% extends 'base.html' %}
-
-{% block style %}
-<style>
-  h2 {
-    color: rgb(255, 195, 65);
-    text-shadow: 0 2px 8px rgba(255, 195, 65, 0.7);
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-  }
-
-  ul {
-    background: linear-gradient(135deg, rgba(255,195,65,0.3), rgba(255,195,65,0.1));
-    border-radius: 15px;
-    padding: 20px 25px;
-    box-shadow: 0 6px 15px rgba(255, 195, 65, 0.3);
-    list-style-type: none;
-    max-width: 500px;
-    margin: 0 auto 2rem auto;
-    font-size: 1.1rem;
-    color: #333;
-  }
-
-  ul li {
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255, 195, 65, 0.3);
-  }
-
-  ul li:last-child {
-    border-bottom: none;
-  }
-
-  ul li strong {
-    color: rgb(255, 195, 65);
-    font-weight: 700;
-  }
-
-  a {
-    display: inline-block;
-    margin-top: 20px;
-    background: linear-gradient(135deg, rgb(255, 195, 65), rgb(255, 170, 30));
-    color: white;
-    padding: 10px 25px;
-    border-radius: 30px;
-    font-weight: 700;
-    box-shadow: 0 5px 15px rgba(255, 195, 65, 0.7);
-    text-decoration: none;
-    transition: background 0.3s ease;
-  }
-
-  a:hover {
-    background: linear-gradient(135deg, rgb(255, 170, 30), rgb(255, 195, 65));
-  }
-</style>
-{% endblock %}
-
 {% block content %}
 <h2>{{ title }}</h2>
-<ul>
-    <li><strong>Nombre:</strong> {{ detail.name }}</li>
-    <li><strong>Descripción:</strong> {{ detail.description }}</li>
-    <li><strong>Orden:</strong> {{ detail.order }}</li>
-    <li><strong>Estado:</strong> {{ detail.state }}</li>
-    <li><strong>Creado en:</strong> {{ detail.createdAt }}</li>
-    <li><strong>Actualizado en:</strong> {{ detail.updatedAt }}</li>
+<ul class="list-group">
+  <li class="list-group-item"><strong>Nombre:</strong> {{ level.name }}</li>
+  <li class="list-group-item"><strong>Descripción:</strong> {{ level.description }}</li>
+  <li class="list-group-item"><strong>Orden:</strong> {{ level.order }}</li>
+  <li class="list-group-item"><strong>Estado:</strong> {{ level.state }}</li>
+  <li class="list-group-item"><strong>Creado:</strong> {{ level.createdAt }}</li>
+  <li class="list-group-item"><strong>Actualizado:</strong> {{ level.updatedAt }}</li>
 </ul>
-<a href="{{ url_for('Levels.index') }}">Volver a la lista</a>
+<a href="{{ url_for('levels.index') }}" class="btn btn-secondary mt-3">Volver</a>
 {% endblock %}

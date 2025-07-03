@@ -1,26 +1,40 @@
-from flask import Blueprint, render_template, current_app
-from bson.objectid import ObjectId
+from flask import Blueprint, render_template
+from SanFranciscanos.db import get_mongo_db
 
 bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
+
 @bp.route('/')
 def index():
-    mongo = current_app.mongo_db
+    db = get_mongo_db()
 
+    # Roles a considerar
+    roles = ['Catequizado', 'PadreMadre', 'Padrino', 'Ayudante', 'Catequista', 'Eclesiastico']
+    roles_data = {r: db.persons.count_documents({'role': r}) for r in roles}
+
+    # Tipos de institución
+    tipos_institucion = db.institutions.distinct('tipo')
+    tipos_data = {tipo.capitalize(): db.institutions.count_documents({'tipo': tipo}) for tipo in tipos_institucion}
+
+    # Otros conteos
     stats = {
-        'total_catequizados': mongo.catequizados.count_documents({}),
-        'total_padres': mongo.padresmadres.count_documents({}),
-        'total_padrinos': mongo.padrinos.count_documents({}),
-        'total_ayudantes': mongo.ayudantes.count_documents({}),
-        'total_catequistas': mongo.catequistas.count_documents({}),
-        'total_instituciones': mongo.institutions.count_documents({}),
-        'total_cursos': mongo.courses.count_documents({}),
-        'total_grupos': mongo.groups.count_documents({}),
-        'total_asistencias': mongo.attendances.count_documents({}),
-        'total_certificados': mongo.certificates.count_documents({}),
-        'total_documentos': mongo.documents.count_documents({}),
-        'total_sacramentos': mongo.sacraments.count_documents({}),
-        'total_niveles': mongo.levels.count_documents({})
+        'Catequizados': roles_data.get('Catequizado', 0),
+        'Padres o Madres': roles_data.get('PadreMadre', 0),
+        'Padrinos': roles_data.get('Padrino', 0),
+        'Ayudantes': roles_data.get('Ayudante', 0),
+        'Catequistas': roles_data.get('Catequista', 0),
+        'Eclesiásticos': roles_data.get('Eclesiastico', 0),
+        'Instituciones': sum(tipos_data.values()),
+        'Cursos': db.courses.count_documents({}),
+        'Grupos': db.groups.count_documents({}),
+        'Asistencias': db.attendances.count_documents({}),
+        'Certificados': db.certificates.count_documents({}),
+        'Documentos': db.documents.count_documents({}),
+        'Sacramentos': db.sacraments.count_documents({}),
+        'Niveles': db.levels.count_documents({})
     }
 
-    return render_template('dashboard/index.html', stats=stats)
+    return render_template('dashboard/index.html',
+                           stats=stats,
+                           roles_data=roles_data,
+                           tipos_institucion=tipos_data)

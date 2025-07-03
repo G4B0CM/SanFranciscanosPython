@@ -6,13 +6,13 @@
 
 <ul class="list-group mb-4">
     <li class="list-group-item"><strong>Nombre:</strong> {{ course.name }}</li>
-    <li class="list-group-item"><strong>Parroquia:</strong> {{ course.idParroquia }}</li>
-    <li class="list-group-item"><strong>Catequista:</strong> {{ course.idCatequista }}</li>
-    <li class="list-group-item"><strong>Nivel:</strong> {{ course.idLevel }}</li>
+    <li class="list-group-item"><strong>Parroquia:</strong> {{ parroquia.name if parroquia else 'Desconocido' }}</li>
+    <li class="list-group-item"><strong>Catequista:</strong> {{ catequista.c_firstName }} {{ catequista.c_lastName }}</li>
+    <li class="list-group-item"><strong>Nivel:</strong> {{ level.name if level else 'Desconocido' }}</li>
     <li class="list-group-item"><strong>Fecha Inicio:</strong> {{ course.startDate }}</li>
     <li class="list-group-item"><strong>Fecha Fin:</strong> {{ course.endDate }}</li>
 </ul>
 
-<a href="{{ url_for('Courses.edit', id=course._id) }}" class="btn btn-warning">Editar</a>
-<a href="{{ url_for('Courses.index') }}" class="btn btn-secondary">Volver</a>
+<a href="{{ url_for('courses.edit', id=course._id) }}" class="btn btn-warning">Editar</a>
+<a href="{{ url_for('courses.index') }}" class="btn btn-secondary">Volver</a>
 {% endblock %}

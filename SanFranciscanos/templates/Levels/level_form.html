@@ -1,80 +1,35 @@
-
 {% extends 'base.html' %}
-
-{% block style %}
-<style>
-  h2 {
-    color: rgb(255, 195, 65);
-    text-shadow: 0 2px 8px rgba(255, 195, 65, 0.7);
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    text-align: center;
-  }
-
-  form {
-    max-width: 480px;
-    margin: 0 auto;
-    background: linear-gradient(135deg, rgba(255,195,65,0.2), rgba(255,195,65,0.05));
-    padding: 30px 25px;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(255, 195, 65, 0.3);
-  }
-
-  form div {
-    margin-bottom: 20px;
-  }
-
-  label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: rgb(255, 195, 65);
-  }
-
-  input[type="text"],
-  input[type="number"] {
-    width: 100%;
-    padding: 10px 15px;
-    border: 2px solid rgba(255, 195, 65, 0.5);
-    border-radius: 10px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-  }
-
-  input[type="text"]:focus,
-  input[type="number"]:focus {
-    border-color: rgb(255, 195, 65);
-    outline: none;
-    box-shadow: 0 0 10px rgb(255, 195, 65);
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, rgb(255, 195, 65), rgb(255, 170, 30));
-    border: none;
-    padding: 12px 30px;
-    border-radius: 30px;
-    font-weight: 700;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 6px 15px rgba(255, 195, 65, 0.7);
-    transition: background 0.3s ease;
-    display: block;
-    width: 100%;
-  }
-
-  .btn-primary:hover {
-    background: linear-gradient(135deg, rgb(255, 170, 30), rgb(255, 195, 65));
-  }
-</style>
-{% endblock %}
-
 {% block content %}
 <h2>{{ title }}</h2>
-<form method="POST">
+
+<form method="POST" novalidate>
     {{ form.hidden_tag() }}
-    <div>{{ form.name.label }} {{ form.name(size=32) }}</div>
-    <div>{{ form.description.label }} {{ form.description(size=64) }}</div>
-    <div>{{ form.order.label }} {{ form.order(size=8) }}</div>
-    <div>{{ form.submit(class="btn btn-primary") }}</div>
+
+    <div class="mb-3">
+        {{ form.name.label(class="form-label") }}
+        {{ form.name(class="form-control", placeholder="Nombre del nivel") }}
+        {% for error in form.name.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-3">
+        {{ form.description.label(class="form-label") }}
+        {{ form.description(class="form-control", placeholder="Descripción") }}
+        {% for error in form.description.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="mb-3">
+        {{ form.order.label(class="form-label") }}
+        {{ form.order(class="form-control", placeholder="Orden") }}
+        {% for error in form.order.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="{{ url_for('levels.index') }}" class="btn btn-secondary">Cancelar</a>
 </form>
 {% endblock %}

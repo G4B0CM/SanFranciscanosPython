@@ -1,17 +1,38 @@
 {% extends 'base.html' %}
-{% from '_form_helpers.html' import render_field %}
-
 {% block title %}{{ title }}{% endblock %}
+
 {% block content %}
-<h2>{{ title }}</h2>
+<h2 class="mb-4">{{ title }}</h2>
+
 <form method="POST">
     {{ form.hidden_tag() }}
-    <div class="row">
-        <div class="col-md-6">{{ render_field(form.name, class="form-control") }}</div>
-        <div class="col-md-6">{{ render_field(form.type, class="form-control") }}</div>
-        <div class="col-md-6">{{ render_field(form.location, class="form-control") }}</div>
-        <div class="col-md-6">{{ render_field(form.contact, class="form-control") }}</div>
+
+    <div class="mb-3">
+        {{ form.tipo.label(class="form-label") }}
+        {{ form.tipo(class="form-select") }}
     </div>
-    <div class="mt-3">{{ form.submit(class="btn btn-primary") }}</div>
+
+    <div class="mb-3">
+        {{ form.name.label(class="form-label") }}
+        {{ form.name(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.address.label(class="form-label") }}
+        {{ form.address(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.phone.label(class="form-label") }}
+        {{ form.phone(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+        {{ form.parish.label(class="form-label") }}
+        {{ form.parish(class="form-control") }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="{{ url_for('institutions.list_institutions') }}" class="btn btn-secondary">Cancelar</a>
 </form>
 {% endblock %}

@@ -1,94 +1,75 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
-from bson import ObjectId
-from SanFranciscanos.forms import CatequistaForm, AyudanteForm, EclesiasticoForm, PadrinoForm, PadreMadreForm, RolSelectorForm, DeleteForm
-import datetime
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from bson.objectid import ObjectId
+from datetime import datetime
+from SanFranciscanos.forms import PersonForm, DeleteForm
+from SanFranciscanos.db import get_mongo_db
 
-bp = Blueprint('Persons', __name__, url_prefix='/persons')
+bp = Blueprint('persons', __name__, url_prefix='/persons')
 
-def get_form_and_template(role):
-    if role == 'Catequista':
-        return CatequistaForm(), 'catequista_form.html'
-    elif role == 'Ayudante':
-        return AyudanteForm(), 'ayudante_form.html'
-    elif role == 'Eclesiastico':
-        return EclesiasticoForm(), 'eclesiastico_form.html'
-    elif role == 'Padrino':
-        return PadrinoForm(), 'padrino_form.html'
-    elif role == 'PadreMadre':
-        return PadreMadreForm(), 'padremadre_form.html'
-    return None, None
-
-@bp.route('/', methods=['GET', 'POST'])
+@bp.route('/')
 def index():
-    form = RolSelectorForm()
-    if form.validate_on_submit():
-        role = form.role.data
-        return redirect(url_for('Persons.new_person', role=role))
-    return render_template('Persons/select_role.html', form=form, title="Seleccionar Rol")
-
-@bp.route('/new/<role>', methods=['GET', 'POST'])
-def new_person(role):
-    form, template = get_form_and_template(role)
-    if not form:
-        flash('Rol no reconocido.', 'danger')
-        return redirect(url_for('Persons.index'))
-
-    if form.validate_on_submit():
-        person = {key: value for key, value in form.data.items() if key != 'submit'}
-        person.update({
-            'role': role,
-            'createdAt': datetime.datetime.utcnow(),
-            'updatedAt': datetime.datetime.utcnow(),
-            'state': 'Activo'
-        })
-        current_app.mongo_db.persons.insert_one(person)
-        flash(f'{role} creado exitosamente.', 'success')
-        return redirect(url_for('Persons.index'))
-
-    return render_template(f'Persons/{template}', form=form, title=f'Nuevo {role}')
-
-@bp.route('/list/<role>')
-def list_persons(role):
-    persons = list(current_app.mongo_db.persons.find({'role': role}))
+    db = get_mongo_db()
+    persons = list(db['persons'].find())
     delete_form = DeleteForm()
-    return render_template(f'Persons/list_{role.lower()}.html', persons=persons, role=role, delete_form=delete_form, title=f"Lista de {role}s")
+    return render_template('persons/list_persons.html', persons=persons, delete_form=delete_form, title="Personas")
 
-@bp.route('/delete/<role>/<id>', methods=['POST'])
-def delete_person(role, id):
-    current_app.mongo_db.persons.delete_one({'_id': ObjectId(id)})
-    flash(f'{role} eliminado correctamente.', 'success')
-    return redirect(url_for('Persons.list_persons', role=role))
+@bp.route('/new', methods=['GET', 'POST'])
+def new():
+    db = get_mongo_db()
+    form = PersonForm()
+    if form.validate_on_submit():
+        person = {
+            'name': form.name.data,
+            'surname': form.surname.data,
+            'document': form.document.data,
+            'birthdate': form.birthdate.data,
+            'role': form.role.data,
+            'state': 'Activo',
+            'createdAt': datetime.utcnow(),
+            'updatedAt': datetime.utcnow()
+        }
+        result = db['persons'].insert_one(person)
+        flash('Persona creada exitosamente.', 'success')
+        return redirect(url_for('persons.index'))  # Cambiado para que vaya al index
+    return render_template('persons/person_form.html', form=form, title="Nueva Persona")
 
-@bp.route('/edit/<role>/<id>', methods=['GET', 'POST'])
-def edit_person(role, id):
-    form, template = get_form_and_template(role)
-    if not form:
-        flash('Rol no reconocido.', 'danger')
-        return redirect(url_for('Persons.index'))
-
-    person = current_app.mongo_db.persons.find_one({'_id': ObjectId(id)})
+@bp.route('/<id>')
+def detail(id):
+    db = get_mongo_db()
+    person = db['persons'].find_one({'_id': ObjectId(id)})
     if not person:
-        flash(f"{role} no encontrado.", 'warning')
-        return redirect(url_for('Persons.list_persons', role=role))
+        flash('Persona no encontrada.', 'danger')
+        return redirect(url_for('persons.index'))
+    return render_template('persons/detail_person.html', person=person, title="Detalle de Persona")
 
-    if request.method == 'GET':
-        for field in form:
-            if field.name in person:
-                field.data = person[field.name]
+@bp.route('/edit/<id>', methods=['GET', 'POST'])
+def edit(id):
+    db = get_mongo_db()
+    person = db['persons'].find_one({'_id': ObjectId(id)})
+    if not person:
+        flash('Persona no encontrada.', 'danger')
+        return redirect(url_for('persons.index'))
+
+    form = PersonForm(data=person)
 
     if form.validate_on_submit():
-        updates = {key: value for key, value in form.data.items() if key != 'submit'}
-        updates['updatedAt'] = datetime.datetime.utcnow()
-        current_app.mongo_db.persons.update_one({'_id': ObjectId(id)}, {'$set': updates})
-        flash(f"{role} actualizado exitosamente.", 'success')
-        return redirect(url_for('Persons.list_persons', role=role))
+        updates = {
+            'name': form.name.data,
+            'surname': form.surname.data,
+            'document': form.document.data,
+            'birthdate': form.birthdate.data,
+            'role': form.role.data,
+            'updatedAt': datetime.utcnow()
+        }
+        db['persons'].update_one({'_id': ObjectId(id)}, {'$set': updates})
+        flash('Persona actualizada exitosamente.', 'success')
+        return redirect(url_for('persons.index'))
 
-    return render_template(f'Persons/{template}', form=form, title=f'Editar {role}')
+    return render_template('persons/person_form.html', form=form, title="Editar Persona")
 
-@bp.route('/<role>/<id>')
-def detail_person(role, id):
-    person = current_app.mongo_db.persons.find_one({'_id': ObjectId(id)})
-    if not person:
-        flash(f"{role} no encontrado.", 'warning')
-        return redirect(url_for('Persons.list_persons', role=role))
-    return render_template(f'Persons/detail_{role.lower()}.html', person=person, role=role, title=f"Detalle de {role}")
+@bp.route('/delete/<id>', methods=['POST'])
+def delete(id):
+    db = get_mongo_db()
+    db['persons'].delete_one({'_id': ObjectId(id)})
+    flash('Persona eliminada correctamente.', 'success')
+    return redirect(url_for('persons.index'))

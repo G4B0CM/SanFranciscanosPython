@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Detalle de Fe Bautismal{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Detalle del Registro de Fe Bautismal</h2>
+
+<ul class="list-group">
+    <li class="list-group-item"><strong>Nombre Estudiante:</strong> {{ nombreEstudiante }}</li>
+    <li class="list-group-item"><strong>Fecha:</strong> {{ registro.fecha }}</li>
+    <li class="list-group-item"><strong>Lugar:</strong> {{ registro.lugar }}</li>
+    <li class="list-group-item"><strong>Nombre del Padre:</strong> {{ registro.padre }}</li>
+    <li class="list-group-item"><strong>Nombre de la Madre:</strong> {{ registro.madre }}</li>
+    <li class="list-group-item"><strong>Observaciones:</strong> {{ registro.observaciones }}</li>
+</ul>
+
+<a href="{{ url_for('feBautismal.index') }}" class="btn btn-secondary mt-3">Volver a la lista</a>
+{% endblock %}

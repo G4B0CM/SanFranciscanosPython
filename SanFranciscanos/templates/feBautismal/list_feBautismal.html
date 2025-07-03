@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Lista de Fe Bautismal{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Lista de Registros de Fe Bautismal</h2>
+
+<a href="{{ url_for('feBautismal.create_febautismal') }}" class="btn btn-success mb-3">Nuevo Registro</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Estudiante</th>
+            <th>Fecha</th>
+            <th>Lugar</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for registro in registros %}
+        <tr>
+            <td>{{ registro.nombreEstudiante }}</td>
+            <td>{{ registro.fecha }}</td>
+            <td>{{ registro.lugar }}</td>
+            <td>
+                <a href="{{ url_for('feBautismal.detail_febautismal', id=registro._id) }}" class="btn btn-sm btn-primary">Ver</a>
+                <a href="{{ url_for('feBautismal.edit_febautismal', id=registro._id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form method="POST" action="{{ url_for('feBautismal.delete_febautismal', id=registro._id) }}" style="display:inline;">
+                    {{ delete_form.hidden_tag() }}
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Deseas eliminar este registro?')">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

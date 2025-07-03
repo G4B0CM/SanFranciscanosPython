@@ -49,6 +49,17 @@
     outline: none;
   }
 
+  .form-check {
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+
+  .form-check-label {
+    margin-left: 5px;
+    font-weight: bold;
+    color: #444;
+  }
+
   .btn-primary {
     background: linear-gradient(135deg, rgb(255, 195, 65), rgb(255, 180, 50));
     color: white;
@@ -73,19 +84,22 @@
 <h2>{{ title }}</h2>
 <form method="POST">
     {{ form.hidden_tag() }}
-    <div class="form-group">{{ form.name.label }} {{ form.name(class="form-control") }}</div>
-    <div class="form-group">{{ form.description.label }} {{ form.description(class="form-control") }}</div>
-    <div class="form-group">{{ form.required.label }} {{ form.required(class="form-control") }}</div>
-    {{ form.submit(class="btn btn-primary") }}
-</form>
-{% endblock %}
-{% block content %}
-<h2>{{ title }}</h2>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="form-group">{{ form.name.label }} {{ form.name(class="form-control") }}</div>
-    <div class="form-group">{{ form.description.label }} {{ form.description(class="form-control") }}</div>
-    <div class="form-group">{{ form.required.label }} {{ form.required(class="form-control") }}</div>
+
+    <div class="form-group">
+        {{ form.name.label }} 
+        {{ form.name(class="form-control") }}
+    </div>
+
+    <div class="form-group">
+        {{ form.description.label }} 
+        {{ form.description(class="form-control") }}
+    </div>
+
+    <div class="form-check">
+        {{ form.required(class="form-check-input") }}
+        {{ form.required.label(class="form-check-label") }}
+    </div>
+
     {{ form.submit(class="btn btn-primary") }}
 </form>
 {% endblock %}

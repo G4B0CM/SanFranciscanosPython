@@ -1,21 +1,99 @@
 {% extends 'base.html' %}
 {% block title %}Panel de Control{% endblock %}
 
-{% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">📊 Panel de Control SanFranciscanos</h1>
+{% block style %}
+<!-- estilos omitidos por brevedad, puedes mantener los anteriores -->
+{% endblock %}
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {% for label, value in stats.items() %}
-        <div class="col">
-            <div class="card shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title text-capitalize">{{ label.replace('_', ' ') }}</h5>
-                    <p class="card-text display-6">{{ value }}</p>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="text-center mb-4">Panel de Control SanFranciscanos</h1>
+
+  <!-- Tarjetas -->
+  <div class="row g-4 mb-5">
+    {% for label, value in stats.items() %}
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="card shadow-sm p-3 text-center">
+        <div class="icon-circle">📌</div>
+        <h5 class="card-title">{{ label }}</h5>
+        <p class="card-text">{{ value }}</p>
+      </div>
     </div>
+    {% endfor %}
+  </div>
+
+  <!-- Gráficos -->
+  <div class="row mb-5">
+    <div class="col-md-6">
+      <h5 class="text-center">Distribución por Roles</h5>
+      <canvas id="barRoles"></canvas>
+    </div>
+    <div class="col-md-6">
+      <h5 class="text-center">Tipos de Institución</h5>
+      <canvas id="doughnutTipos"></canvas>
+    </div>
+  </div>
 </div>
 {% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Gráfico de barras: Distribución por Roles
+    const rolesLabels = JSON.parse('{{ roles_data.keys() | list | tojson | safe }}');
+    const rolesValues = JSON.parse('{{ roles_data.values() | list | tojson | safe }}');
+
+    const ctxRoles = document.getElementById('barRoles').getContext('2d');
+    new Chart(ctxRoles, {
+      type: 'bar',
+      data: {
+        labels: rolesLabels,
+        datasets: [{
+          label: 'Cantidad por Rol',
+          data: rolesValues,
+          backgroundColor: 'rgba(255, 159, 64, 0.7)',
+          borderColor: 'rgba(255, 159, 64, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 }
+          }
+        }
+      }
+    });
+
+    // Gráfico de dona: Tipos de Institución
+    const tiposLabels = JSON.parse('{{ tipos_institucion.keys() | list | tojson | safe }}');
+    const tiposValues = JSON.parse('{{ tipos_institucion.values() | list | tojson | safe }}');
+
+    const ctxTipos = document.getElementById('doughnutTipos').getContext('2d');
+    new Chart(ctxTipos, {
+      type: 'doughnut',
+      data: {
+        labels: tiposLabels,
+        datasets: [{
+          data: tiposValues,
+          backgroundColor: [
+            '#FFB74D', '#4FC3F7', '#AED581', '#BA68C8', '#FFD54F', '#81D4FA'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
+

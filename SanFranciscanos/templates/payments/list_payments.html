@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Lista de Pagos{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Lista de Pagos</h2>
+
+<a href="{{ url_for('payments.create_payment') }}" class="btn btn-success mb-3">Nuevo Pago</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Estudiante</th>
+            <th>Monto</th>
+            <th>Método</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for payment in payments %}
+        <tr>
+            <td>{{ payment.person_id }}</td>
+            <td>${{ payment.amount }}</td>
+            <td>{{ payment.method }}</td>
+            <td>{{ payment.date }}</td>
+            <td>
+                <a href="{{ url_for('payments.detail_payment', id=payment._id) }}" class="btn btn-sm btn-primary">Ver</a>
+                <a href="{{ url_for('payments.edit_payment', id=payment._id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form method="POST" action="{{ url_for('payments.delete_payment', id=payment._id) }}" style="display:inline;">
+                    {{ delete_form.hidden_tag() }}
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Deseas eliminar este pago?')">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

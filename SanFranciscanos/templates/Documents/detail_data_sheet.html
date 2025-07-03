@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Detalle de la Hoja de Datos{% endblock %}
+
+{% block content %}
+<style>
+  .list-group-item strong {
+    color: rgb(255,195,65);
+  }
+  .card {
+    border: none;
+    box-shadow: 0 4px 12px rgba(255,195,65,0.2);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+  }
+  .card-header {
+    background: linear-gradient(135deg, rgba(255,195,65,0.7), rgba(255,170,30,0.7));
+    color: #333;
+    font-weight: 700;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+</style>
+
+<div class="card">
+  <div class="card-header">
+    <h3>Detalle de la Hoja de Datos</h3>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item"><strong>ID Ficha:</strong> {{ datasheet._id }}</li>
+    <li class="list-group-item"><strong>ID Catequizando:</strong> {{ datasheet.idCatequizando }}</li>
+    <li class="list-group-item"><strong>Nombre:</strong> {{ datasheet.c_firstName }} {{ datasheet.c_secondName }}</li>
+    <li class="list-group-item"><strong>Apellidos:</strong> {{ datasheet.c_lastName }} {{ datasheet.c_secondLastName }}</li>
+    <li class="list-group-item"><strong>Fecha de Nacimiento:</strong> {{ datasheet.c_birthdate }}</li>
+    <li class="list-group-item"><strong>Sexo:</strong> {{ datasheet.c_sex }}</li>
+    <li class="list-group-item"><strong>Escuela:</strong> {{ datasheet.ds_schoolsName }}</li>
+    <li class="list-group-item"><strong>Grado Escolar:</strong> {{ datasheet.ds_schoolGrade }}</li>
+    <li class="list-group-item"><strong>Dirección:</strong> {{ datasheet.ds_mainAddress }}</li>
+    <li class="list-group-item"><strong>Teléfono:</strong> {{ datasheet.ds_residentialPhone }}</li>
+    <li class="list-group-item"><strong>Contacto Emergencia:</strong> {{ datasheet.c_emergencyContactName }} ({{ datasheet.c_emergencyContactPhone }})</li>
+    <li class="list-group-item"><strong>Estado:</strong> {{ datasheet.state }}</li>
+    <li class="list-group-item"><strong>Creado en:</strong> {{ datasheet.createdAt }}</li>
+    <li class="list-group-item"><strong>Actualizado en:</strong> {{ datasheet.updatedAt }}</li>
+  </ul>
+</div>
+
+<a href="{{ url_for('Documents.update_data_sheet', id=datasheet._id) }}" class="btn btn-warning">
+  <i class="fas fa-edit"></i> Editar
+</a>
+<a href="{{ url_for('Documents.index') }}" class="btn btn-secondary">
+  <i class="fas fa-arrow-left"></i> Volver
+</a>
+{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}

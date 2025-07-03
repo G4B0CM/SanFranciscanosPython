@@ -1,6 +1,15 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateField, SelectField, IntegerField, TextAreaField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Optional, Length, Email, Regexp, NumberRange
+from wtforms import StringField, DateField, SelectField, IntegerField, TextAreaField, SubmitField, BooleanField,DecimalField
+from wtforms.validators import DataRequired, Optional, Length, Email, Regexp, NumberRange,optional
+from wtforms.validators import ValidationError
+from bson.objectid import ObjectId
+
+def validate_objectid(form, field):
+    try:
+        ObjectId(str(field.data))
+    except Exception:
+        raise ValidationError('ID inválido. Debe ser un ObjectId de MongoDB.')
+
 class DataSheetForm(FlaskForm):
     # --- Catequizado ---
     c_firstName = StringField('Primer Nombre (Catequizado)', validators=[DataRequired(), Length(max=30)])
@@ -21,7 +30,7 @@ class DataSheetForm(FlaskForm):
     c_details = TextAreaField('Detalles Adicionales (Catequizado)', validators=[Optional()])
     c_idInstitution = IntegerField('ID Parroquia del Catequizado (Opcional)', validators=[Optional()])
     ds_idInstitution = IntegerField('ID Institución (Ficha - Opcional)', validators=[Optional()])
-    ds_idCertificate = IntegerField('ID Certificado Asociado (Opcional)', validators=[Optional()])
+    ds_idCatequizando = IntegerField('ID del Catequizado', validators=[Optional()])
     ds_idLevel = IntegerField('ID Nivel de Inscripción (Opcional)', validators=[Optional()])
     ds_schoolsName = StringField('Nombre de la Escuela', validators=[DataRequired(), Length(max=100)])
     ds_schoolGrade = StringField('Grado/Curso Escolar', validators=[DataRequired(), Length(max=30)])
@@ -87,17 +96,26 @@ class PadreMadreForm(FlaskForm):
     submit = SubmitField('Guardar Padre/Madre')
 
 class InstitutionForm(FlaskForm):
+    type = SelectField(
+        'Tipo de Institución',
+        choices=[
+            ('arquidiocesis', 'Arquidiócesis'),
+            ('vicaria', 'Vicaría'),
+            ('parroquia', 'Parroquia')
+        ],
+        validators=[DataRequired()]
+    )
     name = StringField('Nombre', validators=[DataRequired(), Length(max=100)])
-    type = StringField('Tipo', validators=[DataRequired(), Length(max=50)])
-    location = StringField('Ubicación', validators=[DataRequired(), Length(max=100)])
-    contact = StringField('Contacto', validators=[DataRequired(), Length(max=50)])
-    submit = SubmitField('Guardar')
+    address = StringField('Dirección', validators=[Optional(), Length(max=200)])
+    phone = StringField('Teléfono', validators=[Optional(), Length(max=20)])
+    parish = StringField('Parroquia (si aplica)', validators=[Optional(), Length(max=50)])
+    submit = SubmitField('Guardar Institución')
 
 class LevelForm(FlaskForm):
-    name = StringField('Nombre', validators=[DataRequired(), Length(max=100)])
+    name = StringField('Nombre del Nivel', validators=[DataRequired(), Length(max=100)])
     description = StringField('Descripción', validators=[DataRequired(), Length(max=200)])
     order = IntegerField('Orden del Nivel', validators=[DataRequired(), NumberRange(min=1)])
-    submit = SubmitField('Guardar')
+    submit = SubmitField('Guardar Nivel')
 
 class CursoForm(FlaskForm):
     name = StringField('Nombre del Curso', validators=[DataRequired(), Length(max=50)])
@@ -117,7 +135,7 @@ class GruposForm(FlaskForm):
 class SacramentForm(FlaskForm):
     name = StringField('Nombre del Sacramento', validators=[DataRequired(), Length(max=50)])
     description = TextAreaField('Descripción del Sacramento', validators=[Optional(), Length(max=250)])
-    required = BooleanField('¿Es Requisito para Inscribirse a un Nivel?', default=False)
+    required = BooleanField('¿Es Requisito para Inscribirse a un Nivel?', default=True)
     submit = SubmitField('Guardar Sacramento')
 
 class CatequizadoSacramentoForm(FlaskForm):
@@ -135,13 +153,13 @@ class DocumentForm(FlaskForm):
     category = SelectField('Categoría', choices=[
         ('', '-- Seleccione una Categoría --'),
         ('Identidad', 'Identidad'),
-        ('Educación', 'Educación'),
+        ('Educacion', 'Educacion'),
         ('Sacramentos', 'Sacramentos'),
         ('Salud', 'Salud'),
         ('Legal', 'Legal'),
         ('Otro', 'Otro')
     ], validators=[DataRequired()])
-    submit = SubmitField('Guardar')
+    submit = SubmitField('Guardar Documento')
 
 class CertificateForm(FlaskForm):
     idCatequizado = StringField('ID del Catequizado', validators=[DataRequired(message="Este campo es obligatorio.")])
@@ -149,7 +167,7 @@ class CertificateForm(FlaskForm):
     fechaEmision = DateField('Fecha de Emisión', format='%Y-%m-%d', validators=[DataRequired(message="Ingrese una fecha válida.")])
     lugar = StringField('Lugar de Emisión', validators=[DataRequired(), Length(min=3, max=100)])
     observaciones = TextAreaField('Observaciones', validators=[Length(max=300)])
-    submit = SubmitField('Guardar')
+    submit = SubmitField('Guardar Certificado')
 
 
 class RolSelectorForm(FlaskForm):
@@ -157,15 +175,73 @@ class RolSelectorForm(FlaskForm):
         ('', '-- Seleccione un Rol --'),
         ('Catequista', 'Catequista'),
         ('Ayudante', 'Ayudante'),
-        ('Eclesiastico', 'Eclesiástico'),
+        ('Eclesiastico', 'Eclesiastico'),
         ('Padrino', 'Padrino'),
         ('PadreMadre', 'Padre/Madre')
     ], validators=[DataRequired()])
     submit = SubmitField('Continuar')
 
 class AttendanceForm(FlaskForm):
-    idCurso = IntegerField('ID del Curso', validators=[DataRequired()])
-    idCatequizado = IntegerField('ID del Catequizado', validators=[DataRequired()])
-    date = DateField('Fecha de Asistencia', format='%Y-%m-%d', validators=[DataRequired()])
-    present = BooleanField('¿Asistió?', default=True)
-    submit = SubmitField('Guardar Asistencia')
+    student_id = StringField("ID Catequizado", validators=[DataRequired(), validate_objectid])
+    course_id = StringField("ID Curso", validators=[DataRequired(), validate_objectid])
+    date = DateField("Fecha", validators=[DataRequired()])
+    status = SelectField("Asistió", choices=[("present", "Sí"), ("absent", "No")], validators=[DataRequired()])
+    submit = SubmitField("Guardar")
+
+class StudentForm(FlaskForm):
+    firstName = StringField('Primer Nombre', validators=[DataRequired(), Length(max=30)])
+    secondName = StringField('Segundo Nombre', validators=[Optional(), Length(max=30)])
+    lastName = StringField('Primer Apellido', validators=[DataRequired(), Length(max=30)])
+    secondLastName = StringField('Segundo Apellido', validators=[Optional(), Length(max=30)])
+    sex = SelectField('Sexo', choices=[('', '-- Seleccione --'), ('M', 'Masculino'), ('F', 'Femenino')], validators=[DataRequired()])
+    birthdate = DateField('Fecha de Nacimiento', format='%Y-%m-%d', validators=[DataRequired()])
+    bloodType = StringField('Tipo de Sangre', validators=[Optional(), Length(max=5)])
+    alergies = TextAreaField('Alergias', validators=[Optional(), Length(max=250)])
+    emergencyContactName = StringField('Nombre Contacto de Emergencia', validators=[Optional(), Length(max=50)])
+    emergencyContactPhone = StringField('Teléfono de Emergencia', validators=[Optional(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$')])
+    details = TextAreaField('Detalles Médicos', validators=[Optional(), Length(max=250)])
+    submit = SubmitField('Guardar Catequizado')
+
+
+class PersonForm(FlaskForm):
+    name = StringField('Nombre', validators=[DataRequired(), Length(max=100)])
+    surname = StringField('Apellido', validators=[DataRequired(), Length(max=100)])
+    document = StringField('Documento de Identidad', validators=[Length(max=30)])
+    birthdate = DateField('Fecha de Nacimiento', format='%Y-%m-%d', validators=[DataRequired()])
+    
+    role = SelectField(
+        'Rol',
+        choices=[
+            ('catequista', 'Catequista'),
+            ('ayudante', 'Ayudante'),
+            ('eclesiastico', 'Eclesiástico'),
+            ('padre', 'Padre'),
+            ('madre', 'Madre'),
+            ('padrino', 'Padrino'),
+            ('otros', 'Otros')
+        ],
+        validators=[DataRequired()]
+    )
+
+    submit = SubmitField('Guardar')
+    
+class FeBautismalForm(FlaskForm):
+    person_id = StringField('ID de Persona', validators=[DataRequired(), validate_objectid])
+    church = StringField('Iglesia', validators=[DataRequired()])
+    parish_priest = StringField('Párroco')
+    date = DateField('Fecha del Bautismo', validators=[DataRequired()])
+    submit = SubmitField('Guardar')
+
+class PaymentForm(FlaskForm):
+    person_id = StringField('ID de Persona', validators=[DataRequired(), validate_objectid])
+    amount = DecimalField('Monto', validators=[DataRequired(), NumberRange(min=0)], places=2)
+    method = SelectField('Método de Pago', choices=[
+        ('efectivo', 'Efectivo'),
+        ('transferencia', 'Transferencia'),
+        ('tarjeta', 'Tarjeta'),
+        ('cheque', 'Cheque'),
+        ('otro', 'Otro')
+    ], validators=[DataRequired()])
+    date = DateField('Fecha de Pago', validators=[DataRequired()])
+    notes = StringField('Notas')
+    submit = SubmitField('Guardar')

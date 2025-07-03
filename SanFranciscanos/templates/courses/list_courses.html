@@ -21,14 +21,14 @@
         {% for course in courses %}
         <tr>
             <td>{{ course.name }}</td>
-            <td>{{ course.idParroquia }}</td>
-            <td>{{ course.idCatequista }}</td>
-            <td>{{ course.idLevel }}</td>
+            <td>{{ course.parroquia_name }}</td>
+            <td>{{ course.catequista_name }}</td>
+            <td>{{ course.level_name }}</td>
             <td>{{ course.startDate }} al {{ course.endDate }}</td>
             <td>
-                <a href="{{ url_for('Courses.detail', id=course._id) }}" class="btn btn-sm btn-primary">Ver</a>
-                <a href="{{ url_for('Courses.edit', id=course._id) }}" class="btn btn-sm btn-warning">Editar</a>
-                <form method="post" action="{{ url_for('Courses.delete', id=course._id) }}" style="display:inline;">
+                <a href="{{ url_for('courses.detail', id=course._id) }}" class="btn btn-sm btn-primary">Ver</a>
+                <a href="{{ url_for('courses.edit', id=course._id) }}" class="btn btn-sm btn-warning">Editar</a>
+                <form method="post" action="{{ url_for('courses.delete', id=course._id) }}" style="display:inline;">
                     {{ delete_form.hidden_tag() }}
                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar curso?')">Eliminar</button>
                 </form>

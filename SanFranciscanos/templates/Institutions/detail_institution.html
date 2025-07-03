@@ -1,12 +1,16 @@
 {% extends 'base.html' %}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}Detalle de Institución{% endblock %}
+
 {% block content %}
-<h2>{{ title }}</h2>
+<h2 class="mb-4">Detalle de Institución</h2>
+
 <ul class="list-group">
+  <li class="list-group-item"><strong>Tipo:</strong> {{ institution.tipo.capitalize() }}</li>
   <li class="list-group-item"><strong>Nombre:</strong> {{ institution.name }}</li>
-  <li class="list-group-item"><strong>Tipo:</strong> {{ institution.type }}</li>
-  <li class="list-group-item"><strong>Ubicación:</strong> {{ institution.location }}</li>
-  <li class="list-group-item"><strong>Contacto:</strong> {{ institution.contact }}</li>
+  <li class="list-group-item"><strong>Dirección:</strong> {{ institution.address }}</li>
+  <li class="list-group-item"><strong>Teléfono:</strong> {{ institution.phone }}</li>
+  <li class="list-group-item"><strong>Parroquia:</strong> {{ institution.parish }}</li>
 </ul>
-<a href="{{ url_for('Institutions.index') }}" class="btn btn-secondary mt-3">Volver</a>
+
+<a href="{{ url_for('institutions.list_institutions') }}" class="btn btn-secondary mt-3">Volver</a>
 {% endblock %}

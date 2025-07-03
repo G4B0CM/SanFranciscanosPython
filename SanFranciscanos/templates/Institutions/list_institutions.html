@@ -1,14 +1,39 @@
 {% extends 'base.html' %}
 {% block title %}{{ title }}{% endblock %}
+
 {% block content %}
-<h2>{{ title }}</h2>
-<table class="table">
-    <thead>
+<h2 class="mb-4">{{ title }}</h2>
+
+<a href="{{ url_for('institutions.create_institution') }}" class="btn btn-success mb-3">Nueva Institución</a>
+
+<!-- 🔽 FORMULARIO DE FILTRADO 🔽 -->
+<form method="GET" action="{{ url_for('institutions.list_institutions') }}" class="row g-3 align-items-center mb-3">
+    <div class="col-auto">
+        <label for="tipo" class="col-form-label">Filtrar por tipo:</label>
+    </div>
+    <div class="col-auto">
+        <select name="tipo" id="tipo" class="form-select">
+            <option value="">Todos</option>
+            <option value="arquidiocesis" {% if selected_tipo == 'arquidiocesis' %}selected{% endif %}>Arquidiócesis</option>
+            <option value="vicaria" {% if selected_tipo == 'vicaria' %}selected{% endif %}>Vicaría</option>
+            <option value="parroquia" {% if selected_tipo == 'parroquia' %}selected{% endif %}>Parroquia</option>
+            <option value="capilla" {% if selected_tipo == 'capilla' %}selected{% endif %}>Capilla</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Aplicar Filtro</button>
+    </div>
+</form>
+<!-- 🔼 FIN FORMULARIO DE FILTRADO 🔼 -->
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
         <tr>
             <th>Nombre</th>
             <th>Tipo</th>
-            <th>Ubicación</th>
-            <th>Contacto</th>
+            <th>Dirección</th>
+            <th>Teléfono</th>
+            <th>Parroquia</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -16,20 +41,20 @@
     {% for i in institutions %}
         <tr>
             <td>{{ i.name }}</td>
-            <td>{{ i.type }}</td>
-            <td>{{ i.location }}</td>
-            <td>{{ i.contact }}</td>
+            <td>{{ i.tipo.capitalize() }}</td>
+            <td>{{ i.address }}</td>
+            <td>{{ i.phone }}</td>
+            <td>{{ i.parish }}</td>
             <td>
-                <a href="{{ url_for('Institutions.detail', id=i._id) }}" class="btn btn-info btn-sm">Ver</a>
-                <a href="{{ url_for('Institutions.edit', id=i._id) }}" class="btn btn-warning btn-sm">Editar</a>
-                <form method="POST" action="{{ url_for('Institutions.delete', id=i._id) }}" style="display:inline;">
+                <a href="{{ url_for('institutions.view_institution', id=i._id) }}" class="btn btn-info btn-sm">Ver</a>
+                <a href="{{ url_for('institutions.edit_institution', id=i._id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <form method="POST" action="{{ url_for('institutions.delete_institution', id=i._id) }}" style="display:inline;">
                     {{ delete_form.hidden_tag() }}
-                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta institución?');">Eliminar</button>
                 </form>
             </td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
-<a href="{{ url_for('Institutions.new') }}" class="btn btn-success">Nueva Institución</a>
 {% endblock %}
