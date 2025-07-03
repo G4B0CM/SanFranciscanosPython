@@ -143,33 +143,33 @@ class ParroquiaForm(FlaskForm):
 
 # --- Formularios para Niveles y Cursos (Schema: Nivel) ---
 
+class LevelRolSelectorForm(FlaskForm):
+    """Formulario para seleccionar si gestionar Niveles (definiciones) o Cursos (instancias)."""
+    role = SelectField('¿Qué desea gestionar?', choices=[
+        ('Level', 'Definiciones de Nivel'),
+        ('Curso', 'Cursos Activos')
+    ], validators=[DataRequired()])
+    submit = SubmitField('Seleccionar')
+
 class LevelForm(FlaskForm):
-    """Formulario para Level, coincide con sp_InsertLevel."""
-    idLevel = IntegerField('ID del Nivel', validators=[DataRequired()]) # PK, no identity
+    idLevel = IntegerField('ID del Nivel (ej: 1, 2, 3)', validators=[DataRequired()])
     name = StringField('Nombre del Nivel', validators=[DataRequired(), Length(max=30)])
-    description = TextAreaField('Descripción (Opcional)', validators=[Optional()])
-    idNextLevel = SelectField('Siguiente Nivel (Opcional)', coerce=coerce_int_or_none, validators=[Optional()])
-    numberOfOrder = IntegerField('Número de Orden', validators=[DataRequired(), NumberRange(min=1)])
-    idEnabledSacrament = SelectField('Sacramento que Habilita (Opcional)', coerce=coerce_int_or_none, validators=[Optional()])
+    description = TextAreaField('Descripción', validators=[Optional()])
+    numberOfOrder = IntegerField('Número de Orden', validators=[Optional()])
+    idNextLevel = SelectField('Siguiente Nivel', coerce=coerce_int_or_none, validators=[Optional()])
+    idEnabledSacrament = SelectField('Sacramento que Habilita', coerce=coerce_int_or_none, validators=[Optional()])
     submit = SubmitField('Guardar Nivel')
-    
+
 class CursoForm(FlaskForm):
-    """Formulario para Curso, coincide con sp_InsertCurso."""
     idLevel = SelectField('Tipo de Nivel', coerce=int, validators=[DataRequired()])
     idParroquia = SelectField('Parroquia donde se imparte', coerce=int, validators=[DataRequired()])
     idCatequista = SelectField('Catequista Principal', coerce=int, validators=[DataRequired()])
-    idAyudante = SelectField('Ayudante de Apoyo (Opcional)', coerce=coerce_int_or_none, validators=[Optional()])
-    periodYear = IntegerField('Año del Periodo (Ej: 2024)', validators=[DataRequired(), NumberRange(min=2000, max=2100)])
-    startDate = DateField('Fecha de Inicio', format='%Y-%m-%d', validators=[DataRequired()])
-    duration = IntegerField('Duración (en semanas)', validators=[DataRequired(), NumberRange(min=1)])
-    endDate = DateField('Fecha de Fin (Opcional)', format='%Y-%m-%d', validators=[Optional()])
+    idAyudante = SelectField('Ayudante (Opcional)', coerce=coerce_int_or_none, validators=[Optional()])
+    periodYear = IntegerField('Año del Período', validators=[DataRequired()])
+    startDate = DateField('Fecha de Inicio', validators=[DataRequired()], format='%Y-%m-%d')
+    duration = IntegerField('Duración (en semanas)', validators=[DataRequired()])
+    endDate = DateField('Fecha de Fin (Opcional)', validators=[Optional()], format='%Y-%m-%d')
     submit = SubmitField('Guardar Curso')
-
-class GruposForm(FlaskForm):
-    """Formulario para inscribir un catequizado en un curso."""
-    idCurso = SelectField('Seleccionar Curso', coerce=int, validators=[DataRequired()])
-    idCatequizado = SelectField('Seleccionar Catequizado', coerce=int, validators=[DataRequired()])
-    submit = SubmitField('Inscribir en Grupo')
 
 # --- Formularios para Documentos y Sacramentos (Schemas: Documents, Sacraments) ---
 
