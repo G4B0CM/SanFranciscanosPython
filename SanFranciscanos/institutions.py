@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, abort
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, abort,jsonify
 from sqlalchemy import text, exc
+
 from .forms import (
     ArquidiocesisForm, VicariaForm, ParroquiaForm, 
     InstitutionRolSelectorForm, DeleteForm
@@ -235,17 +236,63 @@ def edit_institution(role, institution_id):
     finally:
         session.close()
 
+@bp.route('/check_dependencies/<int:institution_id>', methods=['GET'])
+def check_dependencies(institution_id):
+    SessionLocal = current_app.SessionLocal
+    session = SessionLocal()
+    try:
+        sp_sql = text("EXEC Institutions.sp_CheckInstitutionDependencies @idInstitution=:id")
+        dependencies = session.execute(sp_sql, {"id": institution_id}).mappings().all()
+        
+        if dependencies:
+            # Si hay dependencias, las agrupamos y las devolvemos
+            grouped_deps = {}
+            for dep in dependencies:
+                if dep['DependencyType'] not in grouped_deps:
+                    grouped_deps[dep['DependencyType']] = []
+                grouped_deps[dep['Description']] = dep['Description'] # Usamos la descripción como clave para evitar duplicados visuales
+            
+            # Formateamos para el modal
+            dependency_list = []
+            for dep_type, descs in grouped_deps.items():
+                if isinstance(descs, list): # Agrupación original
+                    dependency_list.append(f"<strong>{dep_type}:</strong><ul>{''.join(f'<li>{d}</li>' for d in descs)}</ul>")
+            
+            # Corrección para la nueva lógica de agrupamiento
+            formatted_deps = {}
+            for dep in dependencies:
+                dep_type = dep['DependencyType']
+                desc = dep['Description']
+                if dep_type not in formatted_deps:
+                    formatted_deps[dep_type] = []
+                formatted_deps[dep_type].append(desc)
+            
+            html_list = ""
+            for dep_type, desc_list in formatted_deps.items():
+                html_list += f"<p><strong>{dep_type} dependientes:</strong></p><ul class='list-group list-group-flush mb-3'>"
+                for desc in desc_list:
+                    html_list += f"<li class='list-group-item py-1'>{desc}</li>"
+                html_list += "</ul>"
+
+            return jsonify({
+                'can_delete': False,
+                'message': "No se puede eliminar esta institución porque otros registros dependen de ella. Debe eliminar o reasignar las siguientes dependencias primero:",
+                'dependencies_html': html_list
+            })
+        else:
+            # Si no hay dependencias, se puede borrar
+            return jsonify({'can_delete': True})
+    except exc.SQLAlchemyError as e:
+        return jsonify({'can_delete': False, 'message': f"Error al verificar dependencias: {e}"}), 500
+    finally:
+        session.close()
+
+# ---#-!-# RUTA DE BORRADO MODIFICADA ---
 @bp.route('/delete/<role>/<int:institution_id>', methods=['POST'])
 def delete_institution(role, institution_id):
     role_details = get_institution_details(role)
-    if not role_details or 'sp_delete' not in role_details:
-        flash('Rol no reconocido para eliminación.', 'danger')
-        return redirect(url_for('Institutions.index'))
-
-    delete_form = DeleteForm()
-    if not delete_form.validate_on_submit():
-        flash('Intento de borrado no válido.', 'warning')
-        return redirect(url_for('Institutions.list_institutions', role=role))
+    if not role_details:
+        return jsonify({'success': False, 'message': 'Rol no reconocido.'}), 404
 
     SessionLocal = current_app.SessionLocal
     session = SessionLocal()
@@ -253,14 +300,17 @@ def delete_institution(role, institution_id):
         sql_query = text(f"EXEC Institutions.{role_details['sp_delete']} @idInstitution = :id")
         session.execute(sql_query, {"id": institution_id})
         session.commit()
-        flash(f'{role} con ID {institution_id} ha sido eliminada.', 'success')
-    except exc.SQLAlchemyError as e:
-        session.rollback()
-        flash(f"Error de base de datos al eliminar {role}: {getattr(e, 'orig', e)}", 'danger')
-    finally:
-        session.close()
+        return jsonify({
+            'success': True, 
+            'message': f'{role} con ID {institution_id} ha sido eliminada exitosamente.'
+        })
 
-    return redirect(url_for('Institutions.list_institutions', role=role))
+    except exc.SQLAlchemyError as e:
+        if session.is_active: session.rollback()
+        # Este es un error de fallback, la verificación debería haberlo prevenido.
+        return jsonify({'success': False, 'message': 'Error inesperado al intentar borrar. Es posible que hayan surgido nuevas dependencias.'}), 400
+    finally:
+        if session.is_active: session.close()
 
 @bp.route('/<role>/<int:institution_id>')
 def detail_institution(role, institution_id):

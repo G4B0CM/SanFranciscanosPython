@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 {% block title %}{{ title }}{% endblock %}
+
 {% block head_extra %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 {% endblock %}
+
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1>{{ title }}</h1>
     <a href="{{ url_for('Institutions.new_institution', role=role) }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Nueva {{ role }}
+        <i class="fas fa-plus"></i> Nueva {{ display_name_singular or role }}
     </a>
 </div>
 
@@ -16,32 +18,27 @@
     <table class="table table-striped table-hover">
         <thead>
             <tr>
-                {% for header in headers %}
-                <th>{{ header }}</th>
-                {% endfor %}
+                {% for header in headers %}<th>{{ header }}</th>{% endfor %}
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             {% for inst in institutions %}
             <tr>
-                {% for header in headers %}
-                <td>{{ inst[header] or 'N/D' }}</td>
-                {% endfor %}
+                {% for header in headers %}<td>{{ inst[header] or 'N/D' }}</td>{% endfor %}
                 <td>
-                    {# Usamos el primer header como la clave del ID #}
                     {% set inst_id = inst[headers[0]] %}
                     <a href="{{ url_for('Institutions.edit_institution', role=role, institution_id=inst_id) }}"
                         class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
                     <a href="{{ url_for('Institutions.detail_institution', role=role, institution_id=inst_id) }}"
                         class="btn btn-sm btn-info" title="Ver Detalles"><i class="fas fa-eye"></i></a>
-                    <form method="POST"
-                        action="{{ url_for('Institutions.delete_institution', role=role, institution_id=inst_id) }}"
-                        style="display:inline;" onsubmit="return confirm('¿Está seguro?');">
-                        {{ delete_form.hidden_tag() }}
-                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar"><i
-                                class="fas fa-trash-alt"></i></button>
-                    </form>
+
+                    {# ---#-!-# BOTÓN DE BORRADO MODIFICADO --- #}
+                    {# Ya no es un formulario, es un botón que activa el script #}
+                    <button type="button" class="btn btn-sm btn-danger delete-btn" data-id="{{ inst_id }}"
+                        data-role="{{ role }}" data-name="{{ inst[headers[1]] }}" title="Eliminar">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </td>
             </tr>
             {% endfor %}
@@ -51,4 +48,110 @@
 {% else %}
 <div class="alert alert-info" role="alert">No hay {{ role | lower }}s registradas todavía.</div>
 {% endif %}
+
+{# ---#-!-# MODAL PARA CONFIRMACIÓN Y RESULTADOS --- #}
+<div class="modal fade" id="deleteResultModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteModalBody"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                {# Este botón solo se mostrará para la confirmación inicial #}
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Sí, Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+<!-- En templates/Institutions/list.html -->
+
+{% block scripts_extra %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteModalEl = document.getElementById('deleteResultModal');
+        if (!deleteModalEl) return;
+
+        const deleteModal = new bootstrap.Modal(deleteModalEl);
+        const modalTitle = document.getElementById('deleteModalLabel');
+        const modalBody = document.getElementById('deleteModalBody');
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+        let currentIdToDelete = null;
+        let currentRoleToDelete = null;
+
+        // 1. Cuando se hace clic en cualquier botón de eliminar
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                currentIdToDelete = this.dataset.id;
+                currentRoleToDelete = this.dataset.role;
+                const itemName = this.dataset.name;
+
+                // ---#-!-# NUEVO FLUJO DE VERIFICACIÓN ---
+                const checkUrl = `/Institutions/check_dependencies/${currentIdToDelete}`;
+                modalTitle.textContent = 'Verificando dependencias...';
+                modalBody.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+                confirmBtn.style.display = 'none';
+                deleteModal.show();
+
+                fetch(checkUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.can_delete) {
+                            // Si se puede borrar, mostrar el modal de confirmación
+                            modalTitle.textContent = 'Confirmar Eliminación';
+                            modalTitle.className = 'modal-title text-dark';
+                            modalBody.textContent = `¿Está seguro de que desea eliminar "${itemName}"? Esta acción no se puede deshacer.`;
+                            confirmBtn.style.display = 'inline-block';
+                        } else {
+                            // Si NO se puede borrar, mostrar el error y las dependencias
+                            modalTitle.textContent = '❌ No se puede eliminar';
+                            modalTitle.className = 'modal-title text-danger';
+                            modalBody.innerHTML = `<p>${data.message}</p>${data.dependencies_html}`;
+                            confirmBtn.style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        modalTitle.textContent = '❌ Error de Verificación';
+                        modalBody.textContent = 'No se pudo contactar al servidor para verificar las dependencias.';
+                    });
+            });
+        });
+
+        // 2. Cuando se hace clic en el botón "Sí, Eliminar" (solo si la verificación fue exitosa)
+        confirmBtn.addEventListener('click', function () {
+            if (!currentIdToDelete || !currentRoleToDelete) return;
+
+            const deleteUrl = `/Institutions/delete/${currentRoleToDelete}/${currentIdToDelete}`;
+            confirmBtn.style.display = 'none';
+            modalBody.innerHTML = '<div class="d-flex align-items-center"><strong>Eliminando...</strong><div class="spinner-border ms-auto" role="status" aria-hidden="true"></div></div>';
+
+            fetch(deleteUrl, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        modalTitle.textContent = '✅ Eliminación Exitosa';
+                        modalTitle.className = 'modal-title text-success';
+                        modalBody.textContent = data.message;
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        modalTitle.textContent = '❌ Error de Eliminación';
+                        modalTitle.className = 'modal-title text-danger';
+                        modalBody.textContent = data.message;
+                    }
+                })
+                .catch(error => {
+                    modalTitle.textContent = '❌ Error de Red';
+                    modalBody.textContent = 'No se pudo contactar al servidor para realizar la eliminación.';
+                });
+        });
+    });
+</script>
 {% endblock %}
