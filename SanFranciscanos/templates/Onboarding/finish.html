@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Registro Completado{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <div class="py-5">
+        <i class="fas fa-check-circle fa-5x text-success mb-4"></i>
+        <h1 class="display-4">¡Registro Exitoso!</h1>
+        <p class="lead">El catequizado ha sido registrado e inscrito correctamente en el sistema.</p>
+        <hr class="my-4">
+        <p>Puede ver el resumen de la inscripción o volver al inicio.</p>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('Enrollments.list_enrollments') }}" role="button">
+            <i class="fas fa-list-alt me-2"></i>Ver Lista de Inscritos
+        </a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('home.index') }}" role="button">
+            <i class="fas fa-home me-2"></i>Volver al Inicio
+        </a>
+    </div>
+</div>
+{% endblock %}

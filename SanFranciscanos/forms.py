@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateField, SelectField, IntegerField, TextAreaField, SubmitField, BooleanField, DecimalField, SelectMultipleField
+from wtforms import StringField, DateField, SelectField, IntegerField, TextAreaField, SubmitField, BooleanField, DecimalField, SelectMultipleField, HiddenField
 from wtforms.validators import DataRequired, Optional, Length, Email, Regexp, NumberRange
 
 # --- Función de Coerción Personalizada para SelectFields Opcionales ---
@@ -246,6 +246,14 @@ class PaymentForm(FlaskForm):
     paymentState = BooleanField('¿Pagado?', default=True)
     submit = SubmitField('Registrar Pago')
 
+class PaymentFormHidden(FlaskForm):
+    idCatequizado = HiddenField(validators=[DataRequired()])
+    amount = DecimalField('Monto', places=2, validators=[DataRequired()])
+    paymentMethod = StringField('Método de Pago', validators=[DataRequired()])
+    paymentDate = DateField('Fecha de Pago', validators=[DataRequired()], format='%Y-%m-%d')
+    paymentState = BooleanField('¿Pagado?', default=True)
+    submit = SubmitField('Registrar Pago')
+
 class AttendanceForm(FlaskForm):
     idCurso = SelectField('Curso', coerce=coerce_int_or_none, validators=[DataRequired()])
     idCatequizado = SelectField('Catequizado', coerce=coerce_int_or_none, validators=[DataRequired()])
@@ -261,6 +269,17 @@ class AcreditationForm(FlaskForm):
 
 class BautismFaithForm(FlaskForm):
     idCatequizado = SelectField('Fe de Bautismo de', coerce=coerce_int_or_none, validators=[DataRequired()])
+    idParroquia = SelectField('Parroquia del Bautismo', coerce=coerce_int_or_none, validators=[DataRequired()])
+    bautismDate = DateField('Fecha de Bautismo', validators=[DataRequired()], format='%Y-%m-%d')
+    numbrParroquialRegistration = IntegerField('Número de Registro Parroquial', validators=[DataRequired()])
+    idPadre = SelectField('Padre', coerce=coerce_int_or_none, validators=[Optional()])
+    idMadre = SelectField('Madre', coerce=coerce_int_or_none, validators=[Optional()])
+    idPadrino = SelectField('Padrino/Madrina', coerce=coerce_int_or_none, validators=[Optional()])
+    marginalNote = TextAreaField('Nota Marginal', validators=[Optional()])
+    submit = SubmitField('Guardar Fe de Bautismo')
+
+class BautismFaithFormHidden(FlaskForm):
+    idCatequizado = HiddenField(validators=[DataRequired()])
     idParroquia = SelectField('Parroquia del Bautismo', coerce=coerce_int_or_none, validators=[DataRequired()])
     bautismDate = DateField('Fecha de Bautismo', validators=[DataRequired()], format='%Y-%m-%d')
     numbrParroquialRegistration = IntegerField('Número de Registro Parroquial', validators=[DataRequired()])

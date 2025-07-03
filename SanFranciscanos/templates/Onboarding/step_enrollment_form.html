@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% from "_form_helpers.html" import render_field %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block head_extra %}
+{# Copia el CSS de la barra de progreso de step_form.html #}
+<style>
+    .progress-container {
+        margin-bottom: 2rem;
+    }
+
+    .progress-step {
+        width: 25%;
+        text-align: center;
+        position: relative;
+        font-weight: 600;
+        color: #ccc;
+        transition: color 0.4s ease;
+    }
+
+    .progress-step.active {
+        color: var(--dark-gold);
+    }
+
+    .progress-step.completed {
+        color: var(--darker-gold);
+    }
+
+    .progress-step::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -50%;
+        width: 100%;
+        height: 3px;
+        background-color: #e0e0e0;
+        z-index: -1;
+        transform: translateY(-50%);
+    }
+
+    .progress-step:first-child::before {
+        content: none;
+    }
+
+    .progress-step .step-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #e0e0e0;
+        border: 3px solid #e0e0e0;
+        margin: 0 auto 10px;
+        line-height: 24px;
+        font-weight: bold;
+        color: white;
+        transition: all 0.4s ease;
+    }
+
+    .progress-step.active .step-circle {
+        background-color: white;
+        border-color: var(--primary-color);
+        color: var(--dark-gold);
+    }
+
+    .progress-step.completed .step-circle {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">{{ title }}</h1>
+
+    <!-- Barra de Progreso Visual -->
+    <div class="d-flex progress-container">
+        <div class="progress-step completed">
+            <div class="step-circle"><i class="fas fa-check"></i></div>Ficha de Datos
+        </div>
+        <div class="progress-step completed">
+            <div class="step-circle"><i class="fas fa-check"></i></div>Fe de Bautismo
+        </div>
+        <div class="progress-step completed">
+            <div class="step-circle"><i class="fas fa-check"></i></div>Pago
+        </div>
+        <div class="progress-step active">
+            <div class="step-circle">4</div>Inscripción a Curso
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4 text-center">
+            <form id="enrollment-final-step-form">
+                <p class="lead">Seleccione el curso al que desea inscribir al catequizado.</p>
+                <div class="mb-3">
+                    {{ render_field(form.idCurso, class='form-select') }}
+                </div>
+                <button type="submit" class="btn btn-success btn-lg"><i class="fas fa-check-circle me-2"></i>Finalizar
+                    Inscripción</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para mostrar resultado final -->
+<div class="modal fade" id="enrollResultModal" tabindex="-1" aria-labelledby="enrollResultModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="enrollResultModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message"></p>
+            </div>
+            <div class="modal-footer">
+                <a id="modal-finish-button" href="{{ url_for('Onboarding.finish') }}"
+                    class="btn btn-primary d-none">Continuar</a>
+                <button id="modal-close-button" type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+    document.getElementById('enrollment-final-step-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+
+        const formData = new FormData(form);
+        const actionUrl = "{{ url_for('Onboarding.process_enrollment', catequizado_id=catequizado_id) }}";
+
+        fetch(actionUrl, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-CSRFToken': '{{ csrf_token() }}' } // Para la protección CSRF de Flask-WTF
+        })
+            .then(response => response.json())
+            .then(data => {
+                const modal = new bootstrap.Modal(document.getElementById('enrollResultModal'));
+                const titleEl = document.getElementById('enrollResultModalLabel');
+                const messageEl = document.getElementById('modal-message');
+                const finishButton = document.getElementById('modal-finish-button');
+                const closeButton = document.getElementById('modal-close-button');
+
+                if (data.success) {
+                    titleEl.textContent = '✅ Inscripción Exitosa';
+                    titleEl.className = 'modal-title text-success';
+                    messageEl.textContent = data.message;
+                    finishButton.classList.remove('d-none');
+                    closeButton.classList.add('d-none');
+                } else {
+                    titleEl.textContent = '❌ Error en la Inscripción';
+                    titleEl.className = 'modal-title text-danger';
+                    messageEl.textContent = data.message;
+                    finishButton.classList.add('d-none');
+                    closeButton.classList.remove('d-none');
+                }
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ocurrió un error de conexión.');
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-check-circle me-2"></i>Finalizar Inscripción';
+            });
+    });
+</script>
+{% endblock %}

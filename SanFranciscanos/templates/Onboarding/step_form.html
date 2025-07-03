@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% from "_form_helpers.html" import render_field %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block head_extra %}
+<style>
+    .progress-container {
+        margin-bottom: 2rem;
+    }
+
+    .progress-step {
+        width: 25%;
+        text-align: center;
+        position: relative;
+        font-weight: 600;
+        color: #ccc;
+        transition: color 0.4s ease;
+    }
+
+    .progress-step.active {
+        color: var(--dark-gold);
+    }
+
+    .progress-step.completed {
+        color: var(--darker-gold);
+    }
+
+    .progress-step::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -50%;
+        width: 100%;
+        height: 3px;
+        background-color: #e0e0e0;
+        z-index: -1;
+        transform: translateY(-50%);
+    }
+
+    .progress-step:first-child::before {
+        content: none;
+    }
+
+    .progress-step .step-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #e0e0e0;
+        border: 3px solid #e0e0e0;
+        margin: 0 auto 10px;
+        line-height: 24px;
+        font-weight: bold;
+        color: white;
+        transition: all 0.4s ease;
+    }
+
+    .progress-step.active .step-circle {
+        background-color: white;
+        border-color: var(--primary-color);
+        color: var(--dark-gold);
+    }
+
+    .progress-step.completed .step-circle {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">{{ title }}</h1>
+
+    <!-- Barra de Progreso Visual -->
+    <div class="d-flex progress-container">
+        <div class="progress-step {% if step >= 1 %}active{% endif %} {% if step > 1 %}completed{% endif %}">
+            <div class="step-circle">{% if step > 1 %}<i class="fas fa-check"></i>{% else %}1{% endif %}</div>
+            Ficha de Datos
+        </div>
+        <div class="progress-step {% if step >= 2 %}active{% endif %} {% if step > 2 %}completed{% endif %}">
+            <div class="step-circle">{% if step > 2 %}<i class="fas fa-check"></i>{% else %}2{% endif %}</div>
+            Fe de Bautismo
+        </div>
+        <div class="progress-step {% if step >= 3 %}active{% endif %} {% if step > 3 %}completed{% endif %}">
+            <div class="step-circle">{% if step > 3 %}<i class="fas fa-check"></i>{% else %}3{% endif %}</div>
+            Pago
+        </div>
+        <div class="progress-step {% if step >= 4 %}active{% endif %} {% if step > 4 %}completed{% endif %}">
+            <div class="step-circle">{% if step > 4 %}<i class="fas fa-check"></i>{% else %}4{% endif %}</div>
+            Inscripción a Curso
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <form method="POST" action="{{ action_url }}" novalidate>
+                {{ form.hidden_tag() }}
+
+                {# Lógica para el formulario grande de DataSheet #}
+                {% if step == 1 %}
+                {# Simplemente iteramos sobre la variable 'field_groups' que ya viene del controlador #}
+                {% for group_title, fields in field_groups.items() %}
+                <fieldset class="p-3 border rounded mb-4">
+                    <legend class="w-auto px-2 fs-6 fw-bold">{{ group_title }}</legend>
+                    <div class="row g-3">
+                        {% for field in fields %}
+                        <div class="col-md-6">{{ render_field(field, class='form-control form-control-sm') }}</div>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+                {% endfor %}
+                {% else %}
+                {# Renderizado genérico para los otros pasos #}
+                <div class="row g-3">
+                    {% for field in form if field.widget.input_type not in ['hidden', 'submit'] %}
+                    <div class="col-md-6">
+                        {% if field.name == 'idCatequizado' %}
+                        {# No mostramos el campo idCatequizado, ya se sabe #}
+                        {% else %}
+                        {{ render_field(field, class='form-control') }}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="text-center mt-4">
+                    {{ form.submit(class="btn btn-primary btn-lg") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
