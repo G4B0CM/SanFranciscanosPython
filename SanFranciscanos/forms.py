@@ -44,7 +44,7 @@ class CatequizadoForm(FlaskForm):
     state = BooleanField('Estado Activo', default=True)
     alergies = TextAreaField('Alergias', validators=[Optional()])
     details = TextAreaField('Detalles Adicionales', validators=[Optional()])
-    idInstitution = SelectField('Parroquia de Inscripción', coerce=int, validators=[Optional()])
+    idInstitution = SelectField('Parroquia de Inscripción', coerce=coerce_int_or_none, validators=[Optional()])
     
     submit = SubmitField('Guardar')
 
@@ -98,7 +98,7 @@ class PadreMadreForm(FlaskForm):
     lastName = StringField('Primer Apellido', validators=[DataRequired(), Length(max=30)])
     secondLastName = StringField('Segundo Apellido', validators=[Optional(), Length(max=30)])
     sex = SelectField('Sexo', choices=[('', '-- Seleccione --'), ('M', 'Masculino'), ('F', 'Femenino')], validators=[DataRequired()])
-    idCatequizado = SelectField('Catequizado Asociado', coerce=int, validators=[DataRequired()]) # Se debe poblar dinámicamente
+    idCatequizado = SelectField('Catequizado Asociado', coerce=coerce_int_or_none, validators=[DataRequired()]) # Se debe poblar dinámicamente
     ocupation = StringField('Ocupación', validators=[DataRequired(), Length(max=50)])
     phoneContact = StringField('Teléfono de Contacto', validators=[DataRequired(), Length(max=15)])
     emailContact = StringField('Correo Electrónico', validators=[DataRequired(), Email(), Length(max=50)])
@@ -173,60 +173,142 @@ class CursoForm(FlaskForm):
 
 # --- Formularios para Documentos y Sacramentos (Schemas: Documents, Sacraments) ---
 
+class DocumentRolSelectorForm(FlaskForm):
+    role = SelectField('Tipo de Documento a Gestionar', choices=[
+        ('DataSheet', 'Ficha de Inscripción Completa'),
+        ('Payment', 'Registro de Pago'),
+        ('Attendance', 'Registro de Asistencia'),
+        ('Acreditation', 'Acreditación de Parroquia'),
+        ('BautismFaith', 'Fe de Bautismo'),
+        ('LevelAprobation', 'Aprobación de Nivel'),
+        ('LevelCertificate', 'Certificado de Nivel')
+    ], validators=[DataRequired()])
+    submit = SubmitField('Seleccionar')
+
+# El formulario gigante para DataSheet
 class DataSheetForm(FlaskForm):
-    """Formulario complejo para la Hoja de Datos, coincide con sp_InsertDataSheet."""
-    # Catequizado (Person)
-    c_firstName = StringField('Primer Nombre (Catequizado)', validators=[DataRequired(), Length(max=30)])
-    c_secondName = StringField('Segundo Nombre', validators=[Optional(), Length(max=30)])
-    c_lastName = StringField('Primer Apellido', validators=[DataRequired(), Length(max=30)])
-    c_secondLastName = StringField('Segundo Apellido', validators=[Optional(), Length(max=30)])
-    c_sex = SelectField('Sexo', choices=[('', '-- Seleccione --'), ('M', 'Masculino'), ('F', 'Femenino')], validators=[DataRequired()])
-    # DataSheet (specific)
-    ds_sonNumbr = IntegerField('Hijo Número', validators=[Optional(), NumberRange(min=0)])
-    ds_numbrBrothers = IntegerField('Número de Hermanos', validators=[Optional(), NumberRange(min=0)])
-    ds_livesWith = StringField('Vive Con', validators=[Optional(), Length(max=50)])
-    ds_residentialPhone = StringField('Teléfono Residencial', validators=[Optional(), Length(max=15)])
-    ds_mainAddress = TextAreaField('Dirección', validators=[Optional(), Length(max=150)])
-    # Catequizado (specific)
-    c_birthdate = DateField('Fecha de Nacimiento', format='%Y-%m-%d', validators=[DataRequired()])
-    c_bloodType = StringField('Tipo de Sangre', validators=[DataRequired(), Length(max=5)])
+    # Grupo: Datos del Catequizado (c_)
+    c_firstName = StringField('Primer Nombre (Catequizado)', validators=[DataRequired()])
+    c_secondName = StringField('Segundo Nombre', validators=[Optional()])
+    c_lastName = StringField('Primer Apellido', validators=[DataRequired()])
+    c_secondLastName = StringField('Segundo Apellido', validators=[Optional()])
+    c_sex = SelectField('Sexo', choices=[('M', 'Masculino'), ('F', 'Femenino')], validators=[DataRequired()])
+    c_birthdate = DateField('Fecha de Nacimiento', validators=[DataRequired()], format='%Y-%m-%d')
+    c_bloodType = StringField('Tipo de Sangre', validators=[DataRequired()])
     c_alergies = TextAreaField('Alergias', validators=[Optional()])
-    c_emergencyContactName = StringField('Contacto de Emergencia', validators=[DataRequired(), Length(max=50)])
-    c_emergencyContactPhone = StringField('Teléfono de Emergencia', validators=[DataRequired(), Length(max=15)])
-    c_details = TextAreaField('Detalles Adicionales', validators=[Optional()])
-    c_idInstitution = SelectField('Parroquia (Catequizado)', coerce=coerce_int_or_none, validators=[Optional()])
-    # Padre (Person + Parent)
-    f_firstName = StringField('Primer Nombre (Padre)', validators=[Optional(), Length(max=30)])
-    f_secondName = StringField('Segundo Nombre (Padre)', validators=[Optional(), Length(max=30)])
-    f_lastName = StringField('Primer Apellido (Padre)', validators=[Optional(), Length(max=30)])
-    f_secondLastName = StringField('Segundo Apellido (Padre)', validators=[Optional(), Length(max=30)])
-    f_ocupation = StringField('Ocupación (Padre)', validators=[Optional(), Length(max=50)])
-    f_phoneContact = StringField('Teléfono (Padre)', validators=[Optional(), Length(max=15)])
-    f_emailContact = StringField('Email (Padre)', validators=[Optional(), Email(), Length(max=50)])
-    # Madre (Person + Parent)
-    m_firstName = StringField('Primer Nombre (Madre)', validators=[Optional(), Length(max=30)])
-    m_secondName = StringField('Segundo Nombre (Madre)', validators=[Optional(), Length(max=30)])
-    m_lastName = StringField('Primer Apellido (Madre)', validators=[Optional(), Length(max=30)])
-    m_secondLastName = StringField('Segundo Apellido (Madre)', validators=[Optional(), Length(max=30)])
-    m_ocupation = StringField('Ocupación (Madre)', validators=[Optional(), Length(max=50)])
-    m_phoneContact = StringField('Teléfono (Madre)', validators=[Optional(), Length(max=15)])
-    m_emailContact = StringField('Email (Madre)', validators=[Optional(), Email(), Length(max=50)])
-    # DataSheet (IDs y Escolar)
-    ds_idInstitution = SelectField('Institución (Ficha)', coerce=coerce_int_or_none, validators=[Optional()])
-    ds_idCertificate = IntegerField('ID Certificado (Opcional)', validators=[Optional()])
-    ds_idLevel = SelectField('Nivel (Ficha)', coerce=coerce_int_or_none, validators=[Optional()])
-    ds_schoolsName = StringField('Nombre de la Escuela', validators=[DataRequired(), Length(max=100)])
-    ds_schoolGrade = StringField('Grado/Curso Escolar', validators=[DataRequired(), Length(max=30)])
-    submit = SubmitField('Guardar Hoja de Datos')
+    c_emergencyContactName = StringField('Nombre Contacto de Emergencia', validators=[DataRequired()])
+    c_emergencyContactPhone = StringField('Teléfono Contacto de Emergencia', validators=[DataRequired()])
+    c_details = TextAreaField('Detalles Médicos Adicionales', validators=[Optional()])
+    c_idInstitution = SelectField('Parroquia de Origen (Catequizado)', coerce=coerce_int_or_none, validators=[Optional()])
+    
+    # Grupo: Datos del Padre (f_) - Opcional
+    f_firstName = StringField('Primer Nombre (Padre)', validators=[Optional()])
+    f_secondName = StringField('Segundo Nombre (Padre)', validators=[Optional()])
+    f_lastName = StringField('Primer Apellido (Padre)', validators=[Optional()])
+    f_secondLastName = StringField('Segundo Apellido (Padre)', validators=[Optional()])
+    f_ocupation = StringField('Ocupación (Padre)', validators=[Optional()])
+    f_phoneContact = StringField('Teléfono (Padre)', validators=[Optional()])
+    f_emailContact = StringField('Email (Padre)', validators=[Optional()])
+    
+    # Grupo: Datos de la Madre (m_) - Opcional
+    m_firstName = StringField('Primer Nombre (Madre)', validators=[Optional()])
+    m_secondName = StringField('Segundo Nombre (Madre)', validators=[Optional()])
+    m_lastName = StringField('Primer Apellido (Madre)', validators=[Optional()])
+    m_secondLastName = StringField('Segundo Apellido (Madre)', validators=[Optional()])
+    m_ocupation = StringField('Ocupación (Madre)', validators=[Optional()])
+    m_phoneContact = StringField('Teléfono (Madre)', validators=[Optional()])
+    m_emailContact = StringField('Email (Madre)', validators=[Optional()])
+
+    # Grupo: Datos de la Ficha (ds_)
+    ds_sonNumbr = IntegerField('Hijo Número', validators=[Optional()])
+    ds_numbrBrothers = IntegerField('Número de Hermanos', validators=[Optional()])
+    ds_livesWith = StringField('Vive Con', validators=[Optional()])
+    ds_residentialPhone = StringField('Teléfono Residencial', validators=[Optional()])
+    ds_mainAddress = TextAreaField('Dirección Principal', validators=[Optional()])
+    ds_schoolsName = StringField('Nombre de la Escuela', validators=[DataRequired()])
+    ds_schoolGrade = StringField('Grado Escolar', validators=[DataRequired()])
+    ds_idInstitution = SelectField('Parroquia donde se inscribe', coerce=coerce_int_or_none, validators=[DataRequired(message="Debe seleccionar la parroquia de inscripción.")])
+    ds_idLevel = SelectField('Nivel al que se inscribe', coerce=coerce_int_or_none, validators=[DataRequired(message="Debe seleccionar un nivel.")])
+
+    submit = SubmitField('Crear Ficha de Inscripción')
+
+class PaymentForm(FlaskForm):
+    idCatequizado = SelectField('Pago de', coerce=coerce_int_or_none, validators=[DataRequired()])
+    amount = DecimalField('Monto', places=2, validators=[DataRequired()])
+    paymentMethod = StringField('Método de Pago', validators=[DataRequired()])
+    paymentDate = DateField('Fecha de Pago', validators=[DataRequired()], format='%Y-%m-%d')
+    paymentState = BooleanField('¿Pagado?', default=True)
+    submit = SubmitField('Registrar Pago')
+
+class AttendanceForm(FlaskForm):
+    idCurso = SelectField('Curso', coerce=coerce_int_or_none, validators=[DataRequired()])
+    idCatequizado = SelectField('Catequizado', coerce=coerce_int_or_none, validators=[DataRequired()])
+    dateOfAttendance = DateField('Fecha de Asistencia', validators=[DataRequired()], format='%Y-%m-%d')
+    state = BooleanField('Asistió', default=True)
+    submit = SubmitField('Guardar Asistencia')
+
+class AcreditationForm(FlaskForm):
+    idInstitution = SelectField('Parroquia que Acredita', coerce=coerce_int_or_none, validators=[DataRequired()])
+    idCatequizado = SelectField('Acreditar a', coerce=coerce_int_or_none, validators=[DataRequired()])
+    messageText = TextAreaField('Mensaje o Contenido de la Acreditación', validators=[DataRequired()])
+    submit = SubmitField('Guardar Acreditación')
+
+class BautismFaithForm(FlaskForm):
+    idCatequizado = SelectField('Fe de Bautismo de', coerce=coerce_int_or_none, validators=[DataRequired()])
+    idParroquia = SelectField('Parroquia del Bautismo', coerce=coerce_int_or_none, validators=[DataRequired()])
+    bautismDate = DateField('Fecha de Bautismo', validators=[DataRequired()], format='%Y-%m-%d')
+    numbrParroquialRegistration = IntegerField('Número de Registro Parroquial', validators=[DataRequired()])
+    idPadre = SelectField('Padre', coerce=coerce_int_or_none, validators=[Optional()])
+    idMadre = SelectField('Madre', coerce=coerce_int_or_none, validators=[Optional()])
+    idPadrino = SelectField('Padrino/Madrina', coerce=coerce_int_or_none, validators=[Optional()])
+    marginalNote = TextAreaField('Nota Marginal', validators=[Optional()])
+    submit = SubmitField('Guardar Fe de Bautismo')
+
+class LevelAprobationForm(FlaskForm):
+    idCurso = SelectField('Curso', coerce=coerce_int_or_none, validators=[DataRequired()])
+    idCatequizado = SelectField('Catequizado', coerce=coerce_int_or_none, validators=[DataRequired()])
+    idCatequista = SelectField('Aprobado por Catequista', coerce=coerce_int_or_none, validators=[DataRequired()])
+    resultOfLevel = BooleanField('¿Nivel Aprobado?', default=True)
+    commentaries = TextAreaField('Comentarios', validators=[Optional()])
+    submit = SubmitField('Guardar Aprobación')
+
+class LevelCertificateForm(FlaskForm):
+    idCurso = SelectField('Certificado del Curso', coerce=coerce_int_or_none, validators=[DataRequired()])
+    idCatequizado = SelectField('Certificado para', coerce=coerce_int_or_none, validators=[DataRequired()])
+    idCatequista = SelectField('Emitido por Catequista', coerce=coerce_int_or_none, validators=[DataRequired()])
+    idEclesiastico = SelectField('Firmado por Eclesiástico', coerce=coerce_int_or_none, validators=[DataRequired()])
+    deliveryDate = DateField('Fecha de Entrega', validators=[DataRequired()], format='%Y-%m-%d')
+    catequesisPrhase = StringField('Frase de Catequesis', validators=[Optional()])
+    parroquiaLogo = StringField('URL del Logo de la Parroquia', validators=[Optional()])
+    commentaries = TextAreaField('Comentarios Adicionales', validators=[Optional()])
+    submit = SubmitField('Generar Certificado')
+
+# --- Formularios para Sacramentos y Asignaciones (Schemas: Sacraments) ---
+
+class SacramentRolSelectorForm(FlaskForm):
+    """Formulario para seleccionar si gestionar Sacramentos o Asignaciones."""
+    role = SelectField('¿Qué desea gestionar?', choices=[
+        ('Sacrament', 'Eventos de Sacramento'),
+        ('CatequizadoSacramento', 'Asignaciones de Sacramentos')
+    ], validators=[DataRequired()])
+    submit = SubmitField('Seleccionar')
 
 class SacramentForm(FlaskForm):
-    """Formulario para Sacrament, coincide con sp_InsertSacrament."""
-    idSacrament = IntegerField('ID Sacramento', validators=[DataRequired()]) # PK, no identity
-    celebrationDate = DateField('Fecha de Celebración', format='%Y-%m-%d', validators=[DataRequired()])
-    observations = TextAreaField('Observaciones', validators=[DataRequired()])
-    type = StringField('Tipo de Sacramento', validators=[DataRequired(), Length(max=50)])
-    idInstitution = SelectField('Parroquia de Celebración', coerce=int, validators=[DataRequired()])
+    idSacrament = IntegerField('ID del Sacramento (ej: 101, 102)', validators=[DataRequired()])
+    type = StringField('Tipo de Sacramento (ej: Confirmación, Comunión)', validators=[DataRequired(), Length(max=50)])
+    celebrationDate = DateField('Fecha de Celebración', validators=[DataRequired()], format='%Y-%m-%d')
+    # ---#-!-# CORREGIDO ---
+    idInstitution = SelectField('Parroquia donde se celebra', coerce=coerce_int_or_none, validators=[DataRequired(message="Debe seleccionar una parroquia.")])
+    observations = TextAreaField('Observaciones', validators=[Optional()])
     submit = SubmitField('Guardar Sacramento')
+
+class CatequizadoSacramentoForm(FlaskForm):
+    # ---#-!-# CORREGIDO ---
+    idSacramento = SelectField('Seleccionar Sacramento/Evento', coerce=coerce_int_or_none, validators=[DataRequired(message="Debe seleccionar un evento.")])
+    idCatequizado = SelectField('Seleccionar Catequizado', coerce=coerce_int_or_none, validators=[DataRequired(message="Debe seleccionar un catequizado.")])
+    # Este ya estaba bien, pero lo dejamos para consistencia
+    idPadrino = SelectField('Seleccionar Padrino/Madrina (Opcional)', coerce=coerce_int_or_none, validators=[Optional()])
+    submit = SubmitField('Asignar Sacramento')
 
 # --- Formularios Auxiliares ---
 

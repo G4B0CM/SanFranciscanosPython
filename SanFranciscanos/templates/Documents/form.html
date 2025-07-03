@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% from "_form_helpers.html" import render_field %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2>{{ title }}</h2>
+            <form method="POST" action="{{ action_url }}" novalidate>
+                {{ form.hidden_tag() }}
+
+                {% if role == 'DataSheet' and field_groups %}
+                {# Renderizado especial para el formulario grande de DataSheet #}
+                {% for group_title, fields in field_groups.items() %}
+                <fieldset class="p-3 border rounded mb-4">
+                    <legend class="w-auto px-2 fs-5">{{ group_title }}</legend>
+                    <div class="row g-3">
+                        {% for field in fields %}
+                        <div class="col-md-6">{{ render_field(field, class='form-control form-control-sm') }}</div>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+                {% endfor %}
+                {% else %}
+                {# Renderizado genérico para otros formularios #}
+                <div class="row g-3">
+                    {% for field in form if field.widget.input_type not in ['hidden', 'submit'] %}
+                    <div class="col-md-6">{{ render_field(field, class='form-control') }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="text-center mt-4">
+                    {{ form.submit(class="btn btn-primary") }}
+                    <a href="{{ url_for('Documents.list_items', role=role) }}"
+                        class="btn btn-secondary ms-2">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

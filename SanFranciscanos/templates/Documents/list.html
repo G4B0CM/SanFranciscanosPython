@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% from "_form_helpers.html" import render_field %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>{{ title }}</h1>
+    <a href="{{ url_for('Documents.new_item', role=role) }}" class="btn btn-primary"><i class="fas fa-plus"></i> Nuevo
+        {{ role }}</a>
+</div>
+{% if items and headers %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>{% for header in headers %}<th>{{ header }}</th>{% endfor %}<th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                {% for header in headers %}<td>{{ item[header] or 'N/D' }}</td>{% endfor %}
+                <td>
+                    {% if role == 'DataSheet' %}
+                    {% set item_id = item['idDataSheet'] %}
+                    {# Apuntamos a las rutas dedicadas #}
+                    <a href="{{ url_for('Documents.edit_datasheet', item_id=item_id) }}" class="btn btn-sm btn-warning"
+                        title="Editar Ficha"><i class="fas fa-edit"></i></a>
+                    <a href="{{ url_for('Documents.detail_datasheet', item_id=item_id) }}" class="btn btn-sm btn-info"
+                        title="Ver Detalles"><i class="fas fa-eye"></i></a>
+                    <form method="POST" action="{{ url_for('Documents.delete_item', role=role) }}"
+                        style="display:inline;"
+                        onsubmit="return confirm('¿Está seguro? Esto NO borrará el catequizado o sus padres.');">
+                        {{ delete_form.hidden_tag() }}
+                        <input type="hidden" name="item_id" value="{{ item_id }}">
+                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar Ficha"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </form>
+                    {% elif role == 'Attendance' %}
+                    {# Attendance no tiene edición ni detalle, solo borrado #}
+                    <form method="POST" action="{{ url_for('Documents.delete_item', role=role) }}"
+                        style="display:inline;" onsubmit="return confirm('¿Está seguro?');">
+                        {{ delete_form.hidden_tag() }}
+                        {# Pasamos la clave primaria compuesta como campos ocultos #}
+                        <input type="hidden" name="idCurso" value="{{ item['idCurso'] }}">
+                        <input type="hidden" name="idCatequizado" value="{{ item['idCatequizado'] }}">
+                        <input type="hidden" name="dateOfAttendance" value="{{ item['dateOfAttendance'] }}">
+                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </form>
+                    {% else %}
+                    {% set item_id = item[headers[0]] %}
+
+                    <a href="{{ url_for('Documents.edit_item', role=role, item_id=item_id) }}"
+                        class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
+                    <a href="{{ url_for('Documents.detail_item', role=role, item_id=item_id) }}"
+                        class="btn btn-sm btn-info" title="Ver Detalles"><i class="fas fa-eye"></i></a>
+
+                    <form method="POST" action="{{ url_for('Documents.delete_item', role=role) }}"
+                        style="display:inline;" onsubmit="return confirm('¿Está seguro?');">
+                        {{ delete_form.hidden_tag() }}
+                        <input type="hidden" name="item_id" value="{{ item_id }}">
+                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info" role="alert">No hay {{ role | lower }}s registrados todavía.</div>
+{% endif %}
+{% endblock %}

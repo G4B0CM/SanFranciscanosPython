@@ -40,6 +40,20 @@ def get_role_details(role):
                 'Número de Contacto de Emergencia': 'Contacto de Emergencia (Teléfono)',
                 'Detalles': 'Detalles Adicionales',
                 'Estado': 'Estado'
+            },
+            'field_mapping': {
+                'firstName': 'Primer Nombre',
+                'secondName': 'Segundo Nombre',
+                'lastName': 'Primer Apellido',
+                'secondLastName': 'Segundo Apellido',
+                'birthDate': 'Fecha de Nacimiento',
+                'sex': 'Sexo',
+                'bloodType': 'Tipo de sangre',
+                'allergies': 'Alergias',
+                'emergencyContactName': 'Nombre Contacto de Emergencia',
+                'emergencyContactPhone': 'Número de Contacto de Emergencia',
+                'details': 'Detalles',
+                'state': 'Estado'
             }
         },
         'Catequista': {
@@ -59,6 +73,15 @@ def get_role_details(role):
                 'Sexo': 'Sexo',
                 'Años De Exp': 'Años de Experiencia',
                 'Estado': 'Estado'
+            },
+            'field_mapping': {
+                'firstName': 'Primer Nombre',
+                'secondName': 'Segundo Nombre',
+                'lastName': 'Primer Apellido',
+                'secondLastName': 'Segundo Apellido',
+                'sex': 'Sexo',
+                'yearsOfExp': 'Años De Exp',
+                'state': 'Estado'
             }
         },
         'Ayudante': {
@@ -77,6 +100,14 @@ def get_role_details(role):
                 'Segundo Apellido': 'Segundo Apellido',
                 'Sexo': 'Sexo',
                 'Voluntario Desde': 'Voluntario Desde'
+            },
+            'field_mapping': {
+                'firstName': 'Primer Nombre',
+                'secondName': 'Segundo Nombre',
+                'lastName': 'Primer Apellido',
+                'secondLastName': 'Segundo Apellido',
+                'sex': 'Sexo',
+                'volunteerSince': 'Voluntario Desde'
             }
         },
         'Eclesiastico': {
@@ -96,6 +127,16 @@ def get_role_details(role):
                 'Sexo': 'Sexo',
                 'Rol': 'Rol',
                 'Estado': 'Estado'
+            },
+            'field_mapping': {
+                'firstName': 'Primer Nombre',
+                'secondName': 'Segundo Nombre',
+                'lastName': 'Primer Apellido',
+                'secondLastName': 'Segundo Apellido',
+                'sex': 'Sexo',
+                'role': 'Rol',
+                'state': 'Estado',
+                'idInstitution': 'idInstitution'
             }
         },
         'Padrino': {
@@ -114,6 +155,14 @@ def get_role_details(role):
                 'Segundo Apellido': 'Segundo Apellido',
                 'Sexo': 'Sexo',
                 'Ocupacion': 'Ocupación'
+            },
+            'field_mapping': {
+                'firstName': 'Primer Nombre',
+                'secondName': 'Segundo Nombre',
+                'lastName': 'Primer Apellido',
+                'secondLastName': 'Segundo Apellido',
+                'sex': 'Sexo',
+                'occupation': 'Ocupacion'
             }
         },
         'PadreMadre': {
@@ -136,6 +185,17 @@ def get_role_details(role):
                 'Telefono': 'Teléfono',
                 'Email': 'Email',
                 'Hijo(a) a cargo': 'Hijo(a) a cargo'
+            },
+            'field_mapping': {
+                'firstName': 'Primer Nombre',
+                'secondName': 'Segundo Nombre',
+                'lastName': 'Primer Apellido',
+                'secondLastName': 'Segundo Apellido',
+                'sex': 'Sexo',
+                'occupation': 'Ocupacion',
+                'phone': 'Telefono',
+                'email': 'Email',
+                'idCatequizado': 'ID Hijo'
             }
         }
     }
@@ -146,7 +206,7 @@ def load_dynamic_choices(form, role, session):
     if role == 'PadreMadre':
         # Consulta para obtener ID y nombre completo de todos los catequizados activos
         query = text("SELECT ID, [Primer Nombre], [Primer Apellido] FROM Persons.v_InfoCatequizado WHERE Estado = 1 ORDER BY [Primer Apellido], [Primer Nombre]")
-        catequizados = session.execute(query).all()
+        catequizados = session.execute(query).mappings().all()
         form.idCatequizado.choices = [
             (c.ID, f"{c['Primer Nombre']} {c['Primer Apellido']}") for c in catequizados
         ]
@@ -287,9 +347,9 @@ def edit_person(role, person_id):
     RoleForm = role_details['form']
     SessionLocal = current_app.SessionLocal
     session = SessionLocal()
-    
+
     try:
-        #-!-# OBTENER DATOS DESDE LA VISTA SQL, NO DEL ORM
+        # 1. Obtener datos del registro desde la vista SQL
         query = text(f"SELECT * FROM Persons.{role_details['view']} WHERE ID = :id")
         person_data = session.execute(query, {"id": person_id}).mappings().fetchone()
 
@@ -297,19 +357,29 @@ def edit_person(role, person_id):
             flash(f"{role} con ID {person_id} no encontrado.", 'warning')
             return redirect(url_for('Persons.list_persons', role=role))
 
-        # Precargar el formulario
-        form = RoleForm(data=person_data)
+        # 2. Preparar mapeo para precargar el formulario
+        field_mapping = role_details.get('field_mapping', {})
+        mapped_data = {
+            form_field: person_data.get(view_column)
+            for form_field, view_column in field_mapping.items()
+        }
+
+        # Convertir valores booleanos si es necesario (ejemplo: Estado)
+        if 'state' in mapped_data and mapped_data['state'] is not None:
+            mapped_data['state'] = bool(mapped_data['state'])
+
+        # 3. Precargar el formulario con los datos mapeados
+        form = RoleForm(data=mapped_data)
         load_dynamic_choices(form, role, session)
 
+        # 4. Si se envía el formulario (POST), procesar la actualización
         if form.validate_on_submit():
-            #-!-# LÓGICA DE ACTUALIZACIÓN USANDO STORED PROCEDURE (REEMPLAZA AL ORM)
             params = {
                 key: value for key, value in form.data.items()
                 if key not in ['submit', 'csrf_token']
             }
-            # El SP de actualización necesita el ID de la persona a modificar
-            params['idPerson'] = person_id
-            
+            params['idPerson'] = person_id  # Parámetro obligatorio para el SP de actualización
+
             param_placeholders = [f"@{k}=:{k}" for k in params.keys()]
             sql_string = f"EXEC Persons.{role_details['sp_update']} {', '.join(param_placeholders)}"
 
@@ -322,6 +392,7 @@ def edit_person(role, person_id):
                 session.rollback()
                 flash(f"Error de base de datos al actualizar {role}: {getattr(e, 'orig', e)}", 'danger')
 
+        # Renderizar la plantilla con el formulario precargado
         return render_template(
             role_details['template'],
             form=form,
@@ -329,6 +400,7 @@ def edit_person(role, person_id):
             role=role,
             action_url=url_for('Persons.edit_person', role=role, person_id=person_id)
         )
+
     finally:
         session.close()
 

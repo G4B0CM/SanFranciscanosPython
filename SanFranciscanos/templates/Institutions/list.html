@@ -29,19 +29,35 @@
                 <td>{{ inst[header] or 'N/D' }}</td>
                 {% endfor %}
                 <td>
-                    {# Usamos el primer header como la clave del ID #}
-                    {% set inst_id = inst[headers[0]] %}
-                    <a href="{{ url_for('Institutions.edit_institution', role=role, institution_id=inst_id) }}"
-                        class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
-                    <a href="{{ url_for('Institutions.detail_institution', role=role, institution_id=inst_id) }}"
-                        class="btn btn-sm btn-info" title="Ver Detalles"><i class="fas fa-eye"></i></a>
-                    <form method="POST"
-                        action="{{ url_for('Institutions.delete_institution', role=role, institution_id=inst_id) }}"
+                    {% if role == 'Attendance' %}
+                    {% set curso_id = item['idCurso'] %}
+                    {% set catequizado_id = item['idCatequizado'] %}
+                    {% set date_str = item['dateOfAttendance'].strftime('%Y-%m-%d') %}
+                    <a href="{{ url_for('Documents.edit_attendance', curso_id=curso_id, catequizado_id=catequizado_id, date_str=date_str) }}"
+                        class="btn btn-sm btn-warning" title="Editar Estado"><i class="fas fa-edit"></i></a>
+                    <form method="POST" action="{{ url_for('Documents.delete_item', role=role) }}"
                         style="display:inline;" onsubmit="return confirm('¿Está seguro?');">
                         {{ delete_form.hidden_tag() }}
+                        <input type="hidden" name="idCurso" value="{{ curso_id }}">
+                        <input type="hidden" name="idCatequizado" value="{{ catequizado_id }}">
+                        <input type="hidden" name="dateOfAttendance" value="{{ date_str }}">
                         <button type="submit" class="btn btn-sm btn-danger" title="Eliminar"><i
                                 class="fas fa-trash-alt"></i></button>
                     </form>
+                    {% else %}
+                    {% set item_id = item[headers[0]] %}
+                    <a href="{{ url_for('Documents.edit_item', role=role, item_id=item_id) }}"
+                        class="btn btn-sm btn-warning" title="Editar"><i class="fas fa-edit"></i></a>
+                    <a href="{{ url_for('Documents.detail_item', role=role, item_id=item_id) }}"
+                        class="btn btn-sm btn-info" title="Ver Detalles"><i class="fas fa-eye"></i></a>
+                    <form method="POST" action="{{ url_for('Documents.delete_item', role=role) }}"
+                        style="display:inline;" onsubmit="return confirm('¿Está seguro?');">
+                        {{ delete_form.hidden_tag() }}
+                        <input type="hidden" name="item_id" value="{{ item_id }}">
+                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </form>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

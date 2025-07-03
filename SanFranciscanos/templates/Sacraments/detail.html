@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block head_extra %}
+{# Puedes copiar los estilos de la plantilla de detalle de Persons #}
+{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 700px; margin: 2rem auto;">
+    <div class="card-header">
+        <h2>{{ title }}</h2>
+    </div>
+    {% if detail_items %}
+    <ul class="list-group list-group-flush">
+        {% for label, value in detail_items %}
+        <li class="list-group-item">
+            <strong>{{ label }}:</strong>
+            <span>{{ value if value not in [none, ''] else 'No especificado' }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <div class="card-footer text-center">
+        <a href="{{ url_for('Sacraments.list_items', role=role) }}" class="btn btn-secondary">Volver a la
+            Lista</a>
+    </div>
+</div>
+{% endblock %}

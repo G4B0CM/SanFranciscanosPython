@@ -28,7 +28,15 @@ def get_item_details(role):
                 'Sacramento que Habilita': 'Sacramento Asociado'
             },
             'output_param': 'CreatedLevelID',
-            'id_param': 'idLevel' # Nombre del param PK para los SPs
+            'id_param': 'idLevel',
+            'field_mapping': {
+                'idLevel': 'ID',
+                'name': 'Nombre',
+                'description': 'Descripción',
+                'numberOfOrder': 'Número de Orden',
+                'idNextLevel': 'Siguiente Nivel',  # puede necesitar ajuste si no estás usando ID real
+                'idEnabledSacrament': 'Sacramento que Habilita'  # igual que arriba
+            }
         },
         'Curso': {
             'form': CursoForm,
@@ -44,7 +52,17 @@ def get_item_details(role):
                 'Ayudante Asignado': 'Ayudante'
             },
             'output_param': 'CreatedCursoID',
-            'id_param': 'idCurso'
+            'id_param': 'idCurso',
+            'field_mapping': {
+                'idLevel': 'ID',  # Este campo no está directamente en tu vista, ¡debes agregarlo!
+                'idParroquia': 'Nombre Parroquia',  # También necesitas agregar el idParroquia a la vista
+                'idCatequista': 'ID Catequista',
+                'idAyudante': 'ID Ayudante',
+                'periodYear': 'Año del Período',
+                'startDate': 'Fecha de Inicio',
+                'endDate': 'Fecha de Fin',
+                'duration': 'Duración'
+            }
         }
     }
     return roles.get(role)
@@ -118,32 +136,55 @@ def new_item(role):
 @bp.route('/edit/<role>/<int:item_id>', methods=['GET', 'POST'])
 def edit_item(role, item_id):
     role_details = get_item_details(role)
-    if not role_details: abort(404)
-    form = role_details['form']()
+    if not role_details:
+        abort(404)
+
     SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
         id_col = role_details['list_headers'][0]
-        item_data = session.execute(text(f"SELECT * FROM Nivel.{role_details['view']} WHERE \"{id_col}\" = :id"), {"id": item_id}).mappings().fetchone()
+        item_data = session.execute(
+            text(f"SELECT * FROM Nivel.{role_details['view']} WHERE \"{id_col}\" = :id"),
+            {"id": item_id}
+        ).mappings().fetchone()
+
         if not item_data:
             flash(f"{role} ID {item_id} no encontrado.", 'warning')
             return redirect(url_for('Levels.list_items', role=role))
-        
-        form = role_details['form'](data=item_data)
+
+        # Mapeo de datos de la vista al formulario
+        mapped_data = {
+            form_field: item_data.get(view_col)
+            for form_field, view_col in role_details.get('field_mapping', {}).items()
+        }
+
+        form = role_details['form'](data=mapped_data)
         load_level_dynamic_choices(form, role, session)
 
         if form.validate_on_submit():
             params = {k: v for k, v in form.data.items() if k not in ['submit', 'csrf_token']}
-            params[role_details['id_param']] = item_id # Añadir el ID para el SP de update
+            params[role_details['id_param']] = item_id
             placeholders = [f"@{k}=:{k}" for k in params.keys()]
             sql = f"EXEC Nivel.{role_details['sp_update']} {', '.join(placeholders)}"
             session.execute(text(sql), params)
             session.commit()
             flash(f"{role} actualizado.", 'success')
             return redirect(url_for('Levels.list_items', role=role))
+
+        return render_template(
+            'Levels/form.html',
+            form=form,
+            title=f'Editar {role}',
+            role=role,
+            action_url=url_for('Levels.edit_item', role=role, item_id=item_id)
+        )
+
+    except Exception as e:
+        flash(f"Error al editar {role}: {e}", "danger")
+        return redirect(url_for('Levels.list_items', role=role))
     finally:
         session.close()
-    return render_template('Levels/form.html', form=form, title=f'Editar {role}', role=role, action_url=url_for('Levels.edit_item', role=role, item_id=item_id))
+
 
 @bp.route('/delete/<role>/<int:item_id>', methods=['POST'])
 def delete_item(role, item_id):
