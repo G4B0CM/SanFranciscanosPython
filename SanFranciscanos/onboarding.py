@@ -2,7 +2,7 @@
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify
 from sqlalchemy import text, exc
-from .forms import DataSheetForm, BautismFaithFormHidden, PaymentFormHidden, EnrollmentForm
+from .forms import DataSheetForm, BautismFaithFormHidden, PaymentFormHidden, OnboardingEnrollmentForm
 from .documents import load_document_dynamic_choices # Reutilizamos la lógica de carga
 
 bp = Blueprint('Onboarding', __name__, url_prefix='/Onboarding')
@@ -225,7 +225,8 @@ def process_payment(catequizado_id):
     """Procesa el Pago."""
     form = PaymentFormHidden()
     form.idCatequizado.data = catequizado_id
-
+    SessionLocal = current_app.SessionLocal
+    session = SessionLocal()
     # El formulario de pago no tiene dropdowns, pero el patrón de validación es el mismo.
     if form.validate_on_submit():
         print("--- Formulario de Pago VÁLIDO. Intentando inserción... ---")
@@ -275,7 +276,8 @@ def process_payment(catequizado_id):
 @bp.route('/step/enrollment/<int:catequizado_id>')
 def step_enrollment(catequizado_id):
     """Paso 4: Muestra el formulario para inscribir en un curso."""
-    form = EnrollmentForm()
+    # Usamos el formulario correcto y simple
+    form = OnboardingEnrollmentForm()
     SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
@@ -293,37 +295,50 @@ def step_enrollment(catequizado_id):
 
 @bp.route('/process/enrollment/<int:catequizado_id>', methods=['POST'])
 def process_enrollment(catequizado_id):
-    """Procesa la inscripción final y devuelve JSON para el modal."""
-    # ---#-!-# CORRECCIÓN: Obtener el idCurso del formulario enviado por AJAX
-    id_curso = request.form.get('idCurso', type=int)
-
-    if not id_curso:
-        return jsonify({'success': False, 'message': 'No se seleccionó ningún curso.'})
-
+    """Procesa la inscripción final usando un envío HTML tradicional."""
+    
+    # Usamos el mismo formulario para renderizar y para validar
+    form = OnboardingEnrollmentForm()
+    
+    # Poblamos las opciones antes de validar
+    SessionLocal = current_app.SessionLocal
     session = SessionLocal()
     try:
-        sp_sql = text("EXEC Nivel.sp_InsertGrupos @idCurso=:idCurso, @idCatequizado=:idCatequizado")
-        session.execute(sp_sql, {"idCurso": id_curso, "idCatequizado": catequizado_id})
-        session.commit()
-        return jsonify({
-            'success': True,
-            'message': '¡Inscripción exitosa! El catequizado ha sido añadido al curso.'
-        })
-    except exc.SQLAlchemyError as e:
-        session.rollback()
-        raw_error_msg = str(getattr(e, 'orig', e))
-        try:
-            start_index = raw_error_msg.rfind('[SQL Server]') + len('[SQL Server]')
-            end_index = raw_error_msg.rfind(' (50000)') if '(50000)' in raw_error_msg else -1
-            clean_msg = raw_error_msg[start_index:end_index].strip() if start_index > -1 and end_index > start_index else raw_error_msg.split('] ')[-1]
-        except:
-            clean_msg = raw_error_msg
-        return jsonify({
-            'success': False,
-            'message': clean_msg
-        })
+        cursos = session.execute(text("SELECT ID, [Nombre Nivel], [Año del Período] FROM Nivel.v_InfoCurso ORDER BY [Año del Período] DESC, [Nombre Nivel]")).mappings().all()
+        form.idCurso.choices = [(c.ID, f"{c['Nombre Nivel']} ({c['Año del Período']})") for c in cursos]
     finally:
         session.close()
+
+    if form.validate_on_submit():
+        id_curso = form.idCurso.data
+        session = SessionLocal()
+        try:
+            sp_sql = text("EXEC Nivel.sp_InsertGrupos @idCurso=:idCurso, @idCatequizado=:idCatequizado")
+            session.execute(sp_sql, {"idCurso": id_curso, "idCatequizado": catequizado_id})
+            session.commit()
+            
+            flash('¡Inscripción exitosa! El catequizado ha sido añadido al curso.', 'success')
+            return redirect(url_for('Onboarding.finish'))
+
+        except exc.SQLAlchemyError as e:
+            # ... (la lógica de manejo de errores se mantiene igual) ...
+            if session.is_active: session.rollback()
+            raw_error_msg = str(getattr(e, 'orig', e))
+            try:
+                start_index = raw_error_msg.rfind('[SQL Server]') + len('[SQL Server]')
+                end_index = raw_error_msg.rfind(' (50000)') if '(50000)' in raw_error_msg else -1
+                clean_msg = raw_error_msg[start_index:end_index].strip() if start_index > -1 and end_index > start_index else raw_error_msg.split('] ')[-1]
+            except:
+                clean_msg = raw_error_msg
+            
+            flash(f'Error en la Inscripción: {clean_msg}', 'danger')
+            return redirect(url_for('Onboarding.step_enrollment', catequizado_id=catequizado_id))
+        finally:
+            if session.is_active: session.close()
+    else:
+        # Si la validación falla, este mensaje ahora es correcto
+        flash('Debe seleccionar un curso para continuar.', 'warning')
+        return redirect(url_for('Onboarding.step_enrollment', catequizado_id=catequizado_id))
 
 
 # --- PASO 5: FINALIZACIÓN ---

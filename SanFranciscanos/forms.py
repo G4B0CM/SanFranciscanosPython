@@ -177,6 +177,14 @@ class EnrollmentForm(FlaskForm):
     catequizados = SelectMultipleField('Seleccionar Catequizados a Inscribir', coerce=int, validators=[DataRequired()])
     submit = SubmitField('Inscribir Seleccionados')
 
+class OnboardingEnrollmentForm(FlaskForm):
+    """
+    Formulario específico para el último paso del onboarding.
+    Solo contiene el campo para seleccionar el curso.
+    """
+    idCurso = SelectField('Seleccionar Curso', coerce=int, validators=[DataRequired()])
+    submit = SubmitField('Finalizar Inscripción')
+
 # --- Formularios para Documentos y Sacramentos (Schemas: Documents, Sacraments) ---
 
 class DocumentRolSelectorForm(FlaskForm):
