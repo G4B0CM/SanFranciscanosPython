@@ -56,7 +56,8 @@ def create_app():
     app.SessionLocal = db.SessionLocal
 
     # Registrar Blueprints
-    from . import documents, persons, institutions, sacraments, levels, home
+    from . import documents, persons, institutions, sacraments, levels, home, enrollment
+    app.register_blueprint(enrollment.bp)
     app.register_blueprint(documents.bp)
     app.register_blueprint(persons.bp)
     app.register_blueprint(institutions.bp)

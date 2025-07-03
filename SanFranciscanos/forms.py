@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateField, SelectField, IntegerField, TextAreaField, SubmitField, BooleanField, DecimalField
+from wtforms import StringField, DateField, SelectField, IntegerField, TextAreaField, SubmitField, BooleanField, DecimalField, SelectMultipleField
 from wtforms.validators import DataRequired, Optional, Length, Email, Regexp, NumberRange
 
 # --- Función de Coerción Personalizada para SelectFields Opcionales ---
@@ -170,6 +170,12 @@ class CursoForm(FlaskForm):
     duration = IntegerField('Duración (en semanas)', validators=[DataRequired()])
     endDate = DateField('Fecha de Fin (Opcional)', validators=[Optional()], format='%Y-%m-%d')
     submit = SubmitField('Guardar Curso')
+
+class EnrollmentForm(FlaskForm):
+    idCurso = SelectField('Seleccionar Curso', coerce=int, validators=[DataRequired()])
+    # Usamos SelectMultipleField para permitir seleccionar varios catequizados a la vez
+    catequizados = SelectMultipleField('Seleccionar Catequizados a Inscribir', coerce=int, validators=[DataRequired()])
+    submit = SubmitField('Inscribir Seleccionados')
 
 # --- Formularios para Documentos y Sacramentos (Schemas: Documents, Sacraments) ---
 
