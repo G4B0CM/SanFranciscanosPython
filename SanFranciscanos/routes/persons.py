@@ -22,7 +22,7 @@ def new():
             'name': form.name.data,
             'surname': form.surname.data,
             'document': form.document.data,
-            'birthdate': form.birthdate.data,
+            'birthdate': datetime.combine(form.birthdate.data, datetime.min.time()),
             'role': form.role.data,
             'state': 'Activo',
             'createdAt': datetime.utcnow(),
@@ -30,7 +30,11 @@ def new():
         }
         result = db['persons'].insert_one(person)
         flash('Persona creada exitosamente.', 'success')
-        return redirect(url_for('persons.index'))  # Cambiado para que vaya al index
+        
+        # Si es un Catequizando, redirige a crear certificado
+        if form.role.data == 'Catequizando':
+            return redirect(url_for('certificates.create_certificate', catequizado_id=str(result.inserted_id)))
+        return redirect(url_for('persons.index'))
     return render_template('persons/person_form.html', form=form, title="Nueva Persona")
 
 @bp.route('/<id>')
@@ -57,7 +61,7 @@ def edit(id):
             'name': form.name.data,
             'surname': form.surname.data,
             'document': form.document.data,
-            'birthdate': form.birthdate.data,
+            'birthdate': datetime.combine(form.birthdate.data, datetime.min.time()),
             'role': form.role.data,
             'updatedAt': datetime.utcnow()
         }
@@ -73,3 +77,34 @@ def delete(id):
     db['persons'].delete_one({'_id': ObjectId(id)})
     flash('Persona eliminada correctamente.', 'success')
     return redirect(url_for('persons.index'))
+
+@bp.route('/role/<role>')
+def list_by_role(role):
+    db = get_mongo_db()
+    persons = list(db['persons'].find({'role': role}))
+    delete_form = DeleteForm()
+    return render_template('persons/list_persons.html', persons=persons, delete_form=delete_form, title=f"Personas: {role}")
+
+@bp.route('/nuevo-catequizado', methods=['GET', 'POST'])
+def nuevo_catequizado():
+    db = get_mongo_db()
+    form = PersonForm()
+
+    # Eliminar el campo "role" del formulario para no mostrarlo al usuario
+    del form.role
+
+    if form.validate_on_submit():
+        catequizado = {
+            "name": form.name.data,
+            "surname": form.surname.data,
+            "document": form.document.data,
+            "birthdate": datetime.combine(form.birthdate.data, datetime.min.time()),
+            "role": "Catequizado",  
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        db.persons.insert_one(catequizado)
+        flash("Catequizado creado correctamente.", "success")
+        return redirect(url_for('persons.list_by_role', role='Catequizado'))
+
+    return render_template('persons/simple_form.html', form=form, title="Nuevo Catequizado")

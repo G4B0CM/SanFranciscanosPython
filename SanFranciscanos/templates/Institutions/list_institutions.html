@@ -41,7 +41,7 @@
     {% for i in institutions %}
         <tr>
             <td>{{ i.name }}</td>
-            <td>{{ i.tipo.capitalize() }}</td>
+            <td>{{ i.tipo.capitalize() if i.tipo else 'No definido' }}</td>
             <td>{{ i.address }}</td>
             <td>{{ i.phone }}</td>
             <td>{{ i.parish }}</td>

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from bson.objectid import ObjectId
 from SanFranciscanos.forms import InstitutionForm, DeleteForm
-from SanFranciscanos.db import get_mongo_db  # ← IMPORTACIÓN CORRECTA
+from SanFranciscanos.db import get_mongo_db  
 
 bp = Blueprint('institutions', __name__, url_prefix='/institutions')
 
@@ -73,26 +73,3 @@ def delete_institution(id):
         flash('No se encontró la institución.', 'danger')
     return redirect(url_for('institutions.list_institutions'))
 
-
-@bp.route('/arquidiocesis')
-def list_arquidiocesis():
-    db = get_mongo_db()
-    arquidiocesis = list(db['institutions'].find({'tipo': 'arquidiocesis'}))
-    delete_form = DeleteForm()
-    return render_template('institutions/list_arquidiocesis.html', institutions=arquidiocesis, delete_form=delete_form, title="Lista de Arquidiócesis")
-
-
-@bp.route('/vicarias')
-def list_vicarias():
-    db = get_mongo_db()
-    vicarias = list(db['institutions'].find({'tipo': 'vicaria'}))
-    delete_form = DeleteForm()
-    return render_template('institutions/list_vicarias.html', institutions=vicarias, delete_form=delete_form, title="Lista de Vicarías")
-
-
-@bp.route('/parroquias')
-def list_parroquias():
-    db = get_mongo_db()
-    parroquias = list(db['institutions'].find({'tipo': 'parroquia'}))
-    delete_form = DeleteForm()
-    return render_template('institutions/list_parroquias.html', institutions=parroquias, delete_form=delete_form, title="Lista de Parroquias")

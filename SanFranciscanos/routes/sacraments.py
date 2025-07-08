@@ -5,7 +5,7 @@ from datetime import datetime
 from SanFranciscanos.forms import SacramentForm, DeleteForm
 from SanFranciscanos.db import get_mongo_db
 
-bp = Blueprint('sacraments_bp', __name__, url_prefix='/sacraments')
+bp = Blueprint('sacraments', __name__, url_prefix='/sacraments')
 
 
 @bp.route('/')
@@ -34,7 +34,7 @@ def new():
         }
         db.sacraments.insert_one(sacrament)
         flash("Sacramento creado exitosamente.", 'success')
-        return redirect(url_for('sacraments_bp.index'))
+        return redirect(url_for('sacraments.index'))
     return render_template('sacraments/sacrament_form.html', form=form, title="Nuevo Sacramento")
 
 
@@ -45,11 +45,11 @@ def edit(id):
         sacrament = db.sacraments.find_one({'_id': ObjectId(id)})
     except Exception:
         flash("ID inválido.", 'danger')
-        return redirect(url_for('sacraments_bp.index'))
+        return redirect(url_for('sacraments.index'))
 
     if not sacrament:
         flash("Sacramento no encontrado.", 'warning')
-        return redirect(url_for('sacraments_bp.index'))
+        return redirect(url_for('sacraments.index'))
 
     form = SacramentForm(data=sacrament)
     if form.validate_on_submit():
@@ -61,7 +61,7 @@ def edit(id):
         }
         db.sacraments.update_one({'_id': ObjectId(id)}, {'$set': updates})
         flash("Sacramento actualizado exitosamente.", 'success')
-        return redirect(url_for('sacraments_bp.index'))
+        return redirect(url_for('sacraments.index'))
 
     return render_template('sacraments/sacrament_form.html', form=form, title="Editar Sacramento")
 
@@ -74,7 +74,7 @@ def delete(id):
         flash("Sacramento eliminado correctamente.", 'success')
     except Exception:
         flash("No se pudo eliminar el sacramento (ID inválido).", 'danger')
-    return redirect(url_for('sacraments_bp.index'))
+    return redirect(url_for('sacraments.index'))
 
 
 @bp.route('/<id>')
@@ -84,11 +84,11 @@ def detail(id):
         sacrament = db.sacraments.find_one({'_id': ObjectId(id)})
     except Exception:
         flash("ID inválido.", 'danger')
-        return redirect(url_for('sacraments_bp.index'))
+        return redirect(url_for('sacraments.index'))
 
     if not sacrament:
         flash("Sacramento no encontrado.", 'warning')
-        return redirect(url_for('sacraments_bp.index'))
+        return redirect(url_for('sacraments.index'))
 
     return render_template('sacraments/detail_sacrament.html',
                            sacrament=sacrament,

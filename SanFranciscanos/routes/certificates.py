@@ -9,9 +9,6 @@ import csv
 
 bp = Blueprint('certificates', __name__, url_prefix='/certificates')
 
-
-
-
 def get_next_download():
     base_dir = os.path.join(os.getcwd(), 'descargas')
     os.makedirs(base_dir, exist_ok=True)
@@ -19,18 +16,23 @@ def get_next_download():
     next_number = len(existing) + 1
     return next_number
 
-
-
 @bp.route('/')
 def index():
     db = get_mongo_db()
     certificates = list(db.certificates.find())
+
+    for cert in certificates:
+        student = db.students.find_one({'_id': cert.get('idCatequizado')})
+        sacrament = db.sacraments.find_one({'_id': cert.get('idSacramento')})
+
+        cert['nombreCatequizado'] = f"{student.get('firstName', '')} {student.get('lastName', '')}" if student else "No disponible"
+        cert['nombreSacramento'] = sacrament.get('name', 'No disponible') if sacrament else "No disponible"
+
     delete_form = DeleteForm()
     return render_template('documents/list_certificates.html',
                            certificates=certificates,
                            delete_form=delete_form,
                            title="Certificados")
-    
 
 @bp.route('/download')
 def download_certificates():
@@ -68,15 +70,15 @@ def download_certificates():
                      as_attachment=True,
                      download_name=filename)
 
-
 @bp.route('/new', methods=['GET', 'POST'])
 def create_certificate():
     db = get_mongo_db()
     form = CertificateForm()
+
     form.idCatequizado.choices = [(str(p['_id']), f"{p.get('firstName', '')} {p.get('lastName', '')}") for p in db.students.find()]
     form.idSacramento.choices = [(str(s['_id']), s['name']) for s in db.sacraments.find()]
 
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate_on_submit():
         certificate = {
             'idCatequizado': ObjectId(form.idCatequizado.data),
             'idSacramento': ObjectId(form.idSacramento.data),
@@ -93,7 +95,6 @@ def create_certificate():
 
     return render_template('documents/certificate_form.html', form=form, title="Nuevo Certificado")
 
-
 @bp.route('/<id>')
 def detail_certificate(id):
     db = get_mongo_db()
@@ -106,13 +107,12 @@ def detail_certificate(id):
     sacramento = db.sacraments.find_one({'_id': certificate['idSacramento']})
 
     return render_template(
-        'certificates/detail_certificate.html',
+        'documents/detail_certificate.html',
         certificate=certificate,
         catequizado_name=f"{catequizado['firstName']} {catequizado['lastName']}" if catequizado else 'No disponible',
         sacramento_name=sacramento['name'] if sacramento else 'No disponible',
         title="Detalle del Certificado"
     )
-
 
 @bp.route('/edit/<id>', methods=['GET', 'POST'])
 def edit_certificate(id):
@@ -133,7 +133,7 @@ def edit_certificate(id):
     form.idCatequizado.choices = [(str(p['_id']), f"{p.get('firstName', '')} {p.get('lastName', '')}") for p in db.students.find()]
     form.idSacramento.choices = [(str(s['_id']), s['name']) for s in db.sacraments.find()]
 
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate_on_submit():
         updates = {
             'idCatequizado': ObjectId(form.idCatequizado.data),
             'idSacramento': ObjectId(form.idSacramento.data),
@@ -147,7 +147,6 @@ def edit_certificate(id):
         return redirect(url_for('certificates.index'))
 
     return render_template('documents/certificate_form.html', form=form, title="Editar Certificado")
-
 
 @bp.route('/delete/<id>', methods=['POST'])
 def delete_certificate(id):

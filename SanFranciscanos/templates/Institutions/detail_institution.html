@@ -5,7 +5,7 @@
 <h2 class="mb-4">Detalle de Institución</h2>
 
 <ul class="list-group">
-  <li class="list-group-item"><strong>Tipo:</strong> {{ institution.tipo.capitalize() }}</li>
+  <li class="list-group-item"><strong>Tipo:</strong> {{ institution.tipo.capitalize() if institution.tipo else 'No definido' }}</li>
   <li class="list-group-item"><strong>Nombre:</strong> {{ institution.name }}</li>
   <li class="list-group-item"><strong>Dirección:</strong> {{ institution.address }}</li>
   <li class="list-group-item"><strong>Teléfono:</strong> {{ institution.phone }}</li>

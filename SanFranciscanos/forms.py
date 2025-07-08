@@ -29,11 +29,34 @@ class DataSheetForm(FlaskForm):
     c_emergencyContactPhone = StringField('Teléfono Contacto de Emergencia', validators=[DataRequired(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$', message="Número de teléfono inválido.")])
     c_details = TextAreaField('Detalles Adicionales (Catequizado)', validators=[Optional()])
     c_idInstitution = IntegerField('ID Parroquia del Catequizado (Opcional)', validators=[Optional()])
-    ds_idInstitution = IntegerField('ID Institución (Ficha - Opcional)', validators=[Optional()])
+    ds_idInstitution = SelectField('Institución (Ficha - Opcional)', choices=[], validators=[Optional()], coerce=str)
+    person_id = SelectField('Catequizado', choices=[], validators=[Optional()], coerce=str)
     ds_idCatequizando = IntegerField('ID del Catequizado', validators=[Optional()])
-    ds_idLevel = IntegerField('ID Nivel de Inscripción (Opcional)', validators=[Optional()])
+    ds_idCertificate = SelectField('Certificado', choices=[], validators=[Optional()], coerce=str)
+    ds_idLevel = SelectField('Nivel de Inscripción (Opcional)', choices=[], validators=[Optional()], coerce=str)
+    ds_fechaRegistro = DateField('Fecha de Registro', validators=[DataRequired()])
     ds_schoolsName = StringField('Nombre de la Escuela', validators=[DataRequired(), Length(max=100)])
     ds_schoolGrade = StringField('Grado/Curso Escolar', validators=[DataRequired(), Length(max=30)])
+
+    # --- Padre (Opcionales) ---
+    f_firstName = StringField('Primer Nombre del Padre', validators=[Optional(), Length(max=30)])
+    f_secondName = StringField('Segundo Nombre del Padre', validators=[Optional(), Length(max=30)])
+    f_lastName = StringField('Primer Apellido del Padre', validators=[Optional(), Length(max=30)])
+    f_secondLastName = StringField('Segundo Apellido del Padre', validators=[Optional(), Length(max=30)])
+    f_ocupation = StringField('Ocupación del Padre', validators=[Optional(), Length(max=50)])
+    f_phoneContact = StringField('Teléfono del Padre', validators=[Optional(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$', message="Número inválido.")])
+    f_emailContact = StringField('Correo del Padre', validators=[Optional(), Email(), Length(max=100)])
+
+    # --- Madre (Opcionales) ---
+    m_firstName = StringField('Primer Nombre de la Madre', validators=[Optional(), Length(max=30)])
+    m_secondName = StringField('Segundo Nombre de la Madre', validators=[Optional(), Length(max=30)])
+    m_lastName = StringField('Primer Apellido de la Madre', validators=[Optional(), Length(max=30)])
+    m_secondLastName = StringField('Segundo Apellido de la Madre', validators=[Optional(), Length(max=30)])
+    m_ocupation = StringField('Ocupación de la Madre', validators=[Optional(), Length(max=50)])
+    m_phoneContact = StringField('Teléfono de la Madre', validators=[Optional(), Length(max=15), Regexp(r'^\+?1?\d{7,15}$', message="Número inválido.")])
+    m_emailContact = StringField('Correo de la Madre', validators=[Optional(), Email(), Length(max=100)])
+
+    # --- Submit ---
     submit = SubmitField('Guardar Hoja de Datos')
 
 class DeleteForm(FlaskForm):
@@ -162,13 +185,12 @@ class DocumentForm(FlaskForm):
     submit = SubmitField('Guardar Documento')
 
 class CertificateForm(FlaskForm):
-    idCatequizado = StringField('ID del Catequizado', validators=[DataRequired(message="Este campo es obligatorio.")])
-    idSacramento = StringField('ID del Sacramento', validators=[DataRequired(message="Este campo es obligatorio.")])
-    fechaEmision = DateField('Fecha de Emisión', format='%Y-%m-%d', validators=[DataRequired(message="Ingrese una fecha válida.")])
-    lugar = StringField('Lugar de Emisión', validators=[DataRequired(), Length(min=3, max=100)])
-    observaciones = TextAreaField('Observaciones', validators=[Length(max=300)])
-    submit = SubmitField('Guardar Certificado')
-
+    idCatequizado = SelectField("Catequizado", validators=[DataRequired()], coerce=str)
+    idSacramento = SelectField("Sacramento", validators=[DataRequired()], coerce=str)
+    fechaEmision = DateField("Fecha de Emisión", validators=[DataRequired()])
+    lugar = StringField("Lugar", validators=[DataRequired()])
+    observaciones = TextAreaField("Observaciones", validators=[Optional()])
+    submit = SubmitField("Guardar")
 
 class RolSelectorForm(FlaskForm):
     role = SelectField('Seleccionar Rol', choices=[

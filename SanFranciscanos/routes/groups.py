@@ -23,8 +23,31 @@ def index():
 def new():
     db = get_mongo_db()
     form = GruposForm()
-    form.idCatequizado.choices = [(str(p['_id']), f"{p['c_firstName']} {p['c_lastName']}") for p in db.persons.find()]
+
+    # Obtener person_id desde URL
+    person_id = request.args.get('person_id')
+
+    # Preparar los choices
+    all_catequizados = list(db.persons.find())
+    form.idCatequizado.choices = [(str(p['_id']), f"{p.get('c_firstName', '')} {p.get('c_lastName', '')}") for p in all_catequizados]
     form.idCurso.choices = [(str(c['_id']), c['name']) for c in db.courses.find()]
+
+    # Si viene del flujo anterior
+    if person_id:
+        # Validar existencia
+        catequizado = db.persons.find_one({'_id': ObjectId(person_id)})
+        if not catequizado:
+            flash("Catequizado no válido.", "danger")
+            return redirect(url_for('groups.index'))
+
+        # Validar si ya está inscrito
+        existing_group = db.groups.find_one({'idCatequizado': ObjectId(person_id)})
+        if existing_group:
+            flash("Este catequizado ya está inscrito en un curso.", "info")
+            return redirect(url_for('groups.index'))
+
+        # Preseleccionar
+        form.idCatequizado.data = str(catequizado['_id'])
 
     if form.validate_on_submit():
         nuevo_grupo = {
@@ -39,6 +62,7 @@ def new():
         return redirect(url_for('groups.index'))
 
     return render_template('groups/group_form.html', form=form, title="Nuevo Grupo")
+
 
 
 @bp.route('/<id>')

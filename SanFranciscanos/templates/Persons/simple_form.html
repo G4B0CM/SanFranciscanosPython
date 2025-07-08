@@ -1,0 +1,33 @@
+_form{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>{{ title }}</h2>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="mb-3">
+      {{ form.name.label(class="form-label") }}
+      {{ form.name(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.surname.label(class="form-label") }}
+      {{ form.surname(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.document.label(class="form-label") }}
+      {{ form.document(class="form-control") }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.birthdate.label(class="form-label") }}
+      {{ form.birthdate(class="form-control") }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">{{ form.submit.label.text }}</button>
+    <a href="{{ url_for('persons.list_by_role', role='Catequizado') }}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

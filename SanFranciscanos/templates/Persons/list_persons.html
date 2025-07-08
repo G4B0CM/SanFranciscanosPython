@@ -26,9 +26,9 @@
             <td>{{ person.document }}</td>
             <td>{{ person.role }}</td>
             <td>
-                <a href="{{ url_for('persons.detail', id=person._id) }}" class="btn btn-info btn-sm">Detalle</a>
-                <a href="{{ url_for('persons.edit', id=person._id) }}" class="btn btn-warning btn-sm">Editar</a>
-                <form method="post" action="{{ url_for('persons.delete', id=person._id) }}" style="display:inline;">
+                <a href="{{ url_for('persons.detail', id=person._id|string) }}" class="btn btn-info btn-sm">Detalle</a>
+                <a href="{{ url_for('persons.edit', id=person._id|string) }}" class="btn btn-warning btn-sm">Editar</a>
+                <form method="post" action="{{ url_for('persons.delete', id=person._id|string) }}" style="display:inline;">
                     {{ delete_form.hidden_tag() }}
                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta persona?');">Eliminar</button>
                 </form>
@@ -38,6 +38,6 @@
     </tbody>
 </table>
 {% else %}
-<div class="alert alert-info">No hay personas registradas.</div>
+<div class="alert alert-info">No hay personas registradas con este rol.</div>
 {% endif %}
 {% endblock %}

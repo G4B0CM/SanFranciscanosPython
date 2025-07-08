@@ -5,9 +5,9 @@ from flask import Flask
 from .db import init_db
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='templates')
 
-    # Intentar establecer el locale en español
+    # Establecer configuración regional a español
     try:
         locale.setlocale(locale.LC_ALL, 'es_ES.UTF-8')
     except locale.Error:
@@ -21,22 +21,21 @@ def create_app():
     with open(ruta_config, 'r') as archivo_config:
         config = json.load(archivo_config)
 
-    # Validar existencia de claves necesarias
+    # Validación de claves necesarias
     if 'mongo_uri' not in config or 'mongo_db' not in config:
-        raise KeyError("Las claves 'mongo_uri' y/o 'mongo_db' faltan en config.json")
+        raise KeyError("Faltan las claves 'mongo_uri' y/o 'mongo_db' en config.json")
 
-    # Configuración para Flask
-    app.config['SECRET_KEY'] = config['secret_key']
+    # Configuración Flask
+    app.config['SECRET_KEY'] = config.get('secret_key', 'clave_por_defecto')
     app.config['mongo_uri'] = config['mongo_uri']
     app.config['mongo_db'] = config['mongo_db']
 
-    # Debug opcional
     print(f"[CONFIG] Base MongoDB: {app.config['mongo_db']}")
 
-    # Inicializar base de datos (Mongo)
+    # Inicializar MongoDB
     init_db(app)
 
-    # Registrar Blueprints
+    # === Registro de Blueprints ===
     from .routes.auth         import bp as auth_bp
     from .routes.home         import bp as home_bp
     from .routes.documents    import bp as documents_bp
@@ -52,7 +51,7 @@ def create_app():
     from .routes.dashboard    import bp as dashboard_bp
 
     app.register_blueprint(auth_bp)
-    app.register_blueprint(home_bp)
+    app.register_blueprint(home_bp)          
     app.register_blueprint(documents_bp)
     app.register_blueprint(certificates_bp)
     app.register_blueprint(attendances_bp)

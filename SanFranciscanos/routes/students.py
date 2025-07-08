@@ -18,11 +18,30 @@ def list_students():
 def create_student():
     db = get_mongo_db()
     form = StudentForm()
+
+    # Flujo guiado: viene con person_id
+    person_id = request.args.get('person_id')
+
+    if person_id:
+        # Validar si ya existe un estudiante con ese person_id
+        existing = db.students.find_one({'_id': ObjectId(person_id)})
+        if existing:
+            flash("Este catequizado ya fue registrado como estudiante.", "info")
+            return redirect(url_for('groups.new', person_id=person_id))
+
+        # Opcional: puedes rellenar el formulario automáticamente si tienes los datos
+        person = db.data_sheets.find_one({'_id': ObjectId(person_id)})
+        if person:
+            # Puedes mapear campos relevantes si los tienes
+            form.firstName.data = person.get('c_firstName', '')
+            form.lastName.data = person.get('c_lastName', '')
+
     if form.validate_on_submit():
         data = {key: value for key, value in form.data.items() if key not in ('csrf_token', 'submit')}
-        db.students.insert_one(data)
+        result = db.students.insert_one(data)
         flash('Catequizado registrado exitosamente.', 'success')
-        return redirect(url_for('students.list_students'))
+        return redirect(url_for('groups.new', person_id=str(result.inserted_id)))
+
     return render_template('students/student_form.html', form=form, title="Nuevo Catequizado")
 
 

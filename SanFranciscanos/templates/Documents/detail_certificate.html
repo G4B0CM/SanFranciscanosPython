@@ -15,6 +15,7 @@
     <li class="list-group-item"><strong>Actualizado en:</strong> {{ certificate.updatedAt }}</li>
 </ul>
 
-<a href="{{ url_for('Certificates.edit_certificate', id=certificate._id) }}" class="btn btn-warning">Editar</a>
-<a href="{{ url_for('Certificates.index') }}" class="btn btn-secondary">Volver</a>
+<a href="{{ url_for('certificates.edit_certificate', id=certificate._id) }}" class="btn btn-warning">Editar</a>
+<a href="{{ url_for('certificates.index') }}" class="btn btn-secondary">Volver</a>
 {% endblock %}
+

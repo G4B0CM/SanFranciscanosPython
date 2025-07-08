@@ -13,11 +13,33 @@ def index():
     delete_form = DeleteForm()
     return render_template('payments/list_payments.html', payments=payments, delete_form=delete_form)
 
+
 @bp.route('/new', methods=['GET', 'POST'])
 def create_payment():
     db = get_mongo_db()
     form = PaymentForm()
-    form.person_id.choices = [(str(p['_id']), f"{p.get('firstName', '')} {p.get('lastName', '')}") for p in db.students.find()]
+
+    # Validar si viene de un flujo guiado
+    person_id = request.args.get('person_id')
+    
+    if person_id:
+        person = db.students.find_one({'_id': ObjectId(person_id)})
+        if not person:
+            flash("Catequizado no válido para el pago.", "danger")
+            return redirect(url_for('students.list_students'))
+
+        # Validar si ya tiene un pago registrado
+        existing_payment = db.payments.find_one({'person_id': ObjectId(person_id)})
+        if existing_payment:
+            flash("Este catequizado ya tiene un pago registrado.", "info")
+            return redirect(url_for('students.create_student', person_id=person_id))
+
+        # Limitar el formulario a este catequizado
+        form.person_id.choices = [(person_id, f"{person.get('firstName', '')} {person.get('lastName', '')}")]
+        form.person_id.data = person_id
+    else:
+        # Mostrar todos si se accede directamente
+        form.person_id.choices = [(str(p['_id']), f"{p.get('firstName', '')} {p.get('lastName', '')}") for p in db.students.find()]
 
     if form.validate_on_submit():
         payment = {
@@ -31,9 +53,12 @@ def create_payment():
         }
         db.payments.insert_one(payment)
         flash("Pago registrado exitosamente.", "success")
-        return redirect(url_for('payments.index'))
+
+        # Redirigir al registro del catequizado
+        return redirect(url_for('students.create_student', person_id=form.person_id.data))
 
     return render_template('payments/payment_form.html', form=form, title="Nuevo Pago")
+
 
 @bp.route('/<id>')
 def detail_payment(id):
@@ -41,6 +66,7 @@ def detail_payment(id):
     payment = db.payments.find_one({'_id': ObjectId(id)})
     student = db.students.find_one({'_id': payment.get('person_id')}) if payment else None
     return render_template('payments/detail_payment.html', payment=payment, student=student)
+
 
 @bp.route('/edit/<id>', methods=['GET', 'POST'])
 def edit_payment(id):
@@ -74,6 +100,7 @@ def edit_payment(id):
         return redirect(url_for('payments.index'))
 
     return render_template('payments/payment_form.html', form=form, title="Editar Pago")
+
 
 @bp.route('/delete/<id>', methods=['POST'])
 def delete_payment(id):

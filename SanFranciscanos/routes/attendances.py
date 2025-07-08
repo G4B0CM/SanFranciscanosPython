@@ -3,7 +3,7 @@ from bson.objectid import ObjectId
 from SanFranciscanos.db import get_mongo_db
 from SanFranciscanos.forms import AttendanceForm, DeleteForm
 
-bp = Blueprint('attendances_bp', __name__, url_prefix='/attendances')
+bp = Blueprint('attendances', __name__, url_prefix='/attendances')
 
 
 @bp.route('/')
@@ -26,7 +26,7 @@ def create_attendances():
             "status": form.status.data
         })
         flash("Asistencia registrada correctamente.", "success")
-        return redirect(url_for('attendances_bp.list_attendances'))
+        return redirect(url_for('attendances.list_attendances'))
     return render_template('attendances/attendance_form.html', form=form, title="Registrar Asistencia")
 
 
@@ -50,7 +50,7 @@ def edit_attendances(id):
             }}
         )
         flash("Asistencia actualizada correctamente.", "success")
-        return redirect(url_for('attendances_bp.list_attendances'))
+        return redirect(url_for('attendances.list_attendances'))
 
     return render_template('attendances/attendance_form.html', form=form, title="Editar Asistencia")
 
@@ -61,7 +61,7 @@ def detail_attendances(id):
     item = db.attendances.find_one({"_id": ObjectId(id)})
     if not item:
         flash("Registro no encontrado.", "warning")
-        return redirect(url_for('attendances_bp.list_attendances'))
+        return redirect(url_for('attendances.list_attendances'))
     return render_template('attendances/detail_attendance.html', attendance=item, title="Detalle de Asistencia")
 
 
@@ -73,4 +73,4 @@ def delete_attendances(id):
         flash("Asistencia eliminada correctamente.", "success")
     else:
         flash("No se pudo eliminar el registro.", "danger")
-    return redirect(url_for('attendances_bp.list_attendances'))
+    return redirect(url_for('attendances.list_attendances'))
