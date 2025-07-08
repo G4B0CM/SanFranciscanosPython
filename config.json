@@ -1,6 +1,0 @@
-{
-    "secret_key": "SWD3CR3T",
-    "mongo_uri": "mongodb+srv://admin:admin@clusterudla01.b5qsyh5.mongodb.net/?retryWrites=true&w=majority&appName=ClusterUDLA01",
-    "mongo_db": "SanFranciscanos"
-
-}
